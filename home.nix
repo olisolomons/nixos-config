@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ... }:
+{ pkgs, lib, ... }:
 
 {
   # Home Manager needs a bit of information about you and the paths it should
@@ -34,6 +34,7 @@
     jetbrains.idea-community-bin
     zathura
     nil # nix language server
+    nixfmt-classic
   ];
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
@@ -57,19 +58,22 @@
       modifier = "Mod4";
       terminal = "alacritty";
       startup = [
-        { command = "--no-startup-id ${pkgs.networkmanagerapplet}/bin/nm-applet"; }
+        {
+          command =
+            "--no-startup-id ${pkgs.networkmanagerapplet}/bin/nm-applet";
+        }
         { command = "--no-startup-id ${pkgs.pasystray}/bin/pasystray"; }
       ];
       keybindings = lib.mkOptionDefault {
         "${modifier}+Tab" = "focus right";
-	"${modifier}+b" = "bar mode toggle";
+        "${modifier}+b" = "bar mode toggle";
 
-	"${modifier}+x" = "mode power";
-	"${modifier}+z" = "mode brightness";
-	"${modifier}+ctrl+z" = "mode audio";
-	"${modifier}+r" = "mode launch";
+        "${modifier}+x" = "mode power";
+        "${modifier}+z" = "mode brightness";
+        "${modifier}+ctrl+z" = "mode audio";
+        "${modifier}+r" = "mode launch";
 
-	Print = "exec ${pkgs.flameshot}/bin/flameshot gui";
+        Print = "exec ${pkgs.flameshot}/bin/flameshot gui";
       };
       window.border = 1;
       window.hideEdgeBorders = "smart";
@@ -77,43 +81,47 @@
         size = 0.0; # Hide titles
       };
       modes = {
-	power = {
-	  s = "exec systemctl suspend, mode default";
-	  l = "exec loginctl lock-session, mode default";
-	  u = "exec systemctl poweroff";
-	  r = "exec systemctl reboot";
-	  "Shift+l" = "exec pkill -u $USER, mode default";
+        power = {
+          s = "exec systemctl suspend, mode default";
+          l = "exec loginctl lock-session, mode default";
+          u = "exec systemctl poweroff";
+          r = "exec systemctl reboot";
+          "Shift+l" = "exec pkill -u $USER, mode default";
 
-	  Escape = "mode default";
-	};
-	brightness = let b = "${pkgs.brightnessctl}/bin/brightnessctl"; in {
-	  "${modifier}+z" = "exec ${b} set 1, mode default";
-	  z = "exec ${b} set 1, mode default";
-	  q = "exec ${b} set 2%+";
-	  a = "exec ${b} set 2%- --min-value 1";
+          Escape = "mode default";
+        };
+        brightness = let b = "${pkgs.brightnessctl}/bin/brightnessctl";
+        in {
+          "${modifier}+z" = "exec ${b} set 1, mode default";
+          z = "exec ${b} set 1, mode default";
+          q = "exec ${b} set 2%+";
+          a = "exec ${b} set 2%- --min-value 1";
 
-	  Escape = "mode default";
-	};
-	audio = let pactl = opt: val: "exec ${pkgs.pulseaudio}/bin/pactl set-sink-${opt} @DEFAULT_SINK@ ${val}"; in {
-	  q = pactl "volume" "+10%";
-	  a = pactl "volume" "-10%";
-	  z = pactl "mute" "0" + ", mode default";
-	  "shift+z" = pactl "mute" "1" + ", mode default";
+          Escape = "mode default";
+        };
+        audio = let
+          pactl = opt: val:
+            "exec ${pkgs.pulseaudio}/bin/pactl set-sink-${opt} @DEFAULT_SINK@ ${val}";
+        in {
+          q = pactl "volume" "+10%";
+          a = pactl "volume" "-10%";
+          z = pactl "mute" "0" + ", mode default";
+          "shift+z" = pactl "mute" "1" + ", mode default";
 
-	  Escape = "mode default";
-	};
-	launch = {
-	  f = "exec firefox, mode default";
-	  t = "exec alacritty, mode default";
-	  
-	  Escape = "mode default";
-	};
+          Escape = "mode default";
+        };
+        launch = {
+          f = "exec firefox, mode default";
+          t = "exec alacritty, mode default";
+
+          Escape = "mode default";
+        };
       };
     };
     # start on workspace 1
     extraConfig = "exec i3-msg workspace 1";
   };
-  
+
   services.flameshot = {
     enable = true;
     settings.General = {
@@ -122,24 +130,23 @@
     };
   };
 
-  programs.firefox =
-    let lock-false = {
-          Value = false;
-          Status = "locked";
-        };
-        lock-true = {
-          Value = true;
-          Status = "locked";
-        };
-        nur = import (builtins.fetchTarball {
-          # Get the revision by choosing a version from https://github.com/nix-community/NUR/commits/master
-          url = "https://github.com/nix-community/NUR/archive/e8f2bc12692938b61f559d946204c4caceed8af9.tar.gz";
-          # Get the hash by running `nix-prefetch-url --unpack <url>` on the above url
-          sha256 = "18yx1bj9d4y70c6ff0101qprnwfq1r74b8705c9ibvq1vnav5a50";
-        }) {
-          inherit pkgs;
-        }; in
-  {
+  programs.firefox = let
+    lock-false = {
+      Value = false;
+      Status = "locked";
+    };
+    lock-true = {
+      Value = true;
+      Status = "locked";
+    };
+    nur = import (builtins.fetchTarball {
+      # Get the revision by choosing a version from https://github.com/nix-community/NUR/commits/master
+      url =
+        "https://github.com/nix-community/NUR/archive/e8f2bc12692938b61f559d946204c4caceed8af9.tar.gz";
+      # Get the hash by running `nix-prefetch-url --unpack <url>` on the above url
+      sha256 = "18yx1bj9d4y70c6ff0101qprnwfq1r74b8705c9ibvq1vnav5a50";
+    }) { inherit pkgs; };
+  in {
     enable = true;
     policies = {
       DisableTelemetry = true;
@@ -149,46 +156,59 @@
       PasswordManagerEnabled = false;
     };
 
-      /* ---- PROFILES ---- */
-      # Switch profiles via about:profiles page.
-      # For options that are available in Home-Manager see
-      # https://nix-community.github.io/home-manager/options.html#opt-programs.firefox.profiles
-      profiles ={
-        profile_0 = {           # choose a profile name; directory is /home/<user>/.mozilla/firefox/profile_0
-          id = 0;               # 0 is the default profile; see also option "isDefault"
-          name = "profile_0";   # name as listed in about:profiles
-          isDefault = true;     # can be omitted; true if profile ID is 0
-          settings = {          # specify profile-specific preferences here; check about:config for options
-	    "browser.contentblocking.category" = { Value = "strict"; Status = "locked"; };
-            "extensions.pocket.enabled" = lock-false;
-            "extensions.screenshots.disabled" = lock-true;
-            "browser.topsites.contile.enabled" = lock-false;
-            "browser.search.suggest.enabled" = lock-false;
-            "browser.search.suggest.enabled.private" = lock-false;
-            "browser.urlbar.suggest.searches" = lock-false;
-            "browser.urlbar.showSearchSuggestionsFirst" = lock-false;
-            "browser.newtabpage.activity-stream.feeds.section.topstories" = lock-false;
-            "browser.newtabpage.activity-stream.feeds.snippets" = lock-false;
-            "browser.newtabpage.activity-stream.section.highlights.includePocket" = lock-false;
-            "browser.newtabpage.activity-stream.section.highlights.includeBookmarks" = lock-false;
-            "browser.newtabpage.activity-stream.section.highlights.includeDownloads" = lock-false;
-            "browser.newtabpage.activity-stream.section.highlights.includeVisited" = lock-false;
-            "browser.newtabpage.activity-stream.showSponsored" = lock-false;
-            "browser.newtabpage.activity-stream.system.showSponsored" = lock-false;
-            "browser.newtabpage.activity-stream.showSponsoredTopSites" = lock-false;
-            "browser.newtabpage.activity-stream.feeds.section.highlights" = false;
-            "browser.startup.homepage" = "about:blank";
-            "browser.startup.page" = 3; # reopen tabs from last session
-	    "browser.newtabpage.enabled" = "false";
-            "browser.aboutConfig.showWarning" = false;
-	    "browser.toolbars.bookmarks.visibility" = "never";
-          };
+    # ---- PROFILES ----
+    # Switch profiles via about:profiles page.
+    # For options that are available in Home-Manager see
+    # https://nix-community.github.io/home-manager/options.html#opt-programs.firefox.profiles
+    profiles = {
+      profile_0 =
+        { # choose a profile name; directory is /home/<user>/.mozilla/firefox/profile_0
+          id = 0; # 0 is the default profile; see also option "isDefault"
+          name = "profile_0"; # name as listed in about:profiles
+          isDefault = true; # can be omitted; true if profile ID is 0
+          settings =
+            { # specify profile-specific preferences here; check about:config for options
+              "browser.contentblocking.category" = {
+                Value = "strict";
+                Status = "locked";
+              };
+              "extensions.pocket.enabled" = lock-false;
+              "extensions.screenshots.disabled" = lock-true;
+              "browser.topsites.contile.enabled" = lock-false;
+              "browser.search.suggest.enabled" = lock-false;
+              "browser.search.suggest.enabled.private" = lock-false;
+              "browser.urlbar.suggest.searches" = lock-false;
+              "browser.urlbar.showSearchSuggestionsFirst" = lock-false;
+              "browser.newtabpage.activity-stream.feeds.section.topstories" =
+                lock-false;
+              "browser.newtabpage.activity-stream.feeds.snippets" = lock-false;
+              "browser.newtabpage.activity-stream.section.highlights.includePocket" =
+                lock-false;
+              "browser.newtabpage.activity-stream.section.highlights.includeBookmarks" =
+                lock-false;
+              "browser.newtabpage.activity-stream.section.highlights.includeDownloads" =
+                lock-false;
+              "browser.newtabpage.activity-stream.section.highlights.includeVisited" =
+                lock-false;
+              "browser.newtabpage.activity-stream.showSponsored" = lock-false;
+              "browser.newtabpage.activity-stream.system.showSponsored" =
+                lock-false;
+              "browser.newtabpage.activity-stream.showSponsoredTopSites" =
+                lock-false;
+              "browser.newtabpage.activity-stream.feeds.section.highlights" =
+                false;
+              "browser.startup.homepage" = "about:blank";
+              "browser.startup.page" = 3; # reopen tabs from last session
+              "browser.newtabpage.enabled" = "false";
+              "browser.aboutConfig.showWarning" = false;
+              "browser.toolbars.bookmarks.visibility" = "never";
+            };
           extensions = with nur.repos.rycee.firefox-addons; [
             ublock-origin
             bitwarden
           ];
         };
-      };
+    };
   };
 
   programs.neovim = {
@@ -204,7 +224,15 @@
       vim-sexp
       conjure
     ]) ++ (with pkgs.vimPlugins.nvim-treesitter-parsers; [
-      lua python java clojure haskell bash json yaml go
+      lua
+      python
+      java
+      clojure
+      haskell
+      bash
+      json
+      yaml
+      go
     ]);
     extraConfig = ''
       lua  << CONFIG_END
@@ -218,9 +246,7 @@
     userName = "Oli Solomons";
     userEmail = "oli.solomons@gmail.com";
     ignores = [ ".envrc" ".direnv" ".nvim.lua" ];
-    extraConfig = {
-      init.defaultBranch = "main";
-    };
+    extraConfig = { init.defaultBranch = "main"; };
   };
   programs.tmux = {
     enable = true;

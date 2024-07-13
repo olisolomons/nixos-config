@@ -1,13 +1,12 @@
 # Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, ... }:
+{ pkgs, ... }:
 
 {
-  imports =
-    [ # Include the results of the hardware scan.
-      /etc/nixos/hardware-configuration.nix
-    ];
+  imports = [ # Include the results of the hardware scan.
+    /etc/nixos/hardware-configuration.nix
+  ];
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
@@ -45,13 +44,13 @@
   services.xserver = {
     enable = true;
     windowManager.i3.enable = true;
-    
-    displayManager.lightdm = { 
-      enable = true; 
-      background= ./bg.jpg;
+
+    displayManager.lightdm = {
+      enable = true;
+      background = ./bg.jpg;
       greeters.mini = {
         enable = true;
-	user = "oli";
+        user = "oli";
         extraConfig = ''
           [greeter]
           show-password-label = false
@@ -68,9 +67,7 @@
     '';
   };
 
-  services.displayManager = {
-    defaultSession = "none+i3";
-  };
+  services.displayManager = { defaultSession = "none+i3"; };
 
   # Configure keymap in X11
   services.xserver.xkb = {
@@ -111,9 +108,8 @@
     isNormalUser = true;
     description = "oli";
     extraGroups = [ "networkmanager" "wheel" ];
-    packages = with pkgs; [
-    #  thunderbird
-    ];
+    # packages = with pkgs; [
+    # ];
   };
 
   # Allow unfree packages
@@ -121,20 +117,17 @@
   nixpkgs.config.packageOverrides = pkgs: {
     nur = import (builtins.fetchTarball {
       # Get the revision by choosing a version from https://github.com/nix-community/NUR/commits/master
-      url = "https://github.com/nix-community/NUR/archive/e8f2bc12692938b61f559d946204c4caceed8af9.tar.gz";
+      url =
+        "https://github.com/nix-community/NUR/archive/e8f2bc12692938b61f559d946204c4caceed8af9.tar.gz";
       # Get the hash by running `nix-prefetch-url --unpack <url>` on the above url
       sha256 = "18yx1bj9d4y70c6ff0101qprnwfq1r74b8705c9ibvq1vnav5a50";
-    }) {
-      inherit pkgs;
-    };
+    }) { inherit pkgs; };
   };
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   # List packages installed in system profile. To search, run:
   # $ nix search wget
-  environment.systemPackages = with pkgs; [
-  #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-  #  wget
-  ];
+  # environment.systemPackages = with pkgs; [
+  # ];
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
