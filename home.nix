@@ -49,7 +49,6 @@
       modifier = "Mod4";
       terminal = "alacritty";
       startup = [
-        { command = "--no-startup-id ${pkgs.xss-lock}/bin/xss-lock --transfer-sleep-lock -- i3lock --nofork"; }
         { command = "--no-startup-id ${pkgs.networkmanagerapplet}/bin/nm-applet"; }
         { command = "--no-startup-id ${pkgs.pasystray}/bin/pasystray"; }
       ];
@@ -103,6 +102,8 @@
 	};
       };
     };
+    # start on workspace 1
+    extraConfig = "exec i3-msg workspace 1";
   };
   
   services.flameshot = {

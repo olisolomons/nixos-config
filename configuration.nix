@@ -1,5 +1,4 @@
-# Edit this configuration file to define what should be installed on
-# your system.  Help is available in the configuration.nix(5) man page
+# Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
 { config, pkgs, ... }:
@@ -46,6 +45,27 @@
   services.xserver = {
     enable = true;
     windowManager.i3.enable = true;
+    
+    displayManager.lightdm = { 
+      enable = true; 
+      background= ./bg.jpg;
+      greeters.mini = {
+        enable = true;
+	user = "oli";
+        extraConfig = ''
+          [greeter]
+          show-password-label = false
+          password-alignment = left
+          [greeter-theme]
+          background-image-size = 10px, 10px
+        '';
+      };
+    };
+    displayManager.sessionCommands = ''
+      xset -dpms  # Disable Energy Star, as we are going to suspend anyway and it may hide "success" on that
+      xset s -1 # seconds
+      ${pkgs.lightlocker}/bin/light-locker &
+    '';
   };
 
   services.displayManager = {
@@ -56,6 +76,7 @@
   services.xserver.xkb = {
     layout = "gb";
     variant = "";
+    options = "caps:ctrl_modifier";
   };
 
   # Configure console keymap
