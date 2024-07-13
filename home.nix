@@ -21,11 +21,19 @@
     xclip
     alacritty
     jq
+    ripgrep
     tree
     gnumake
     (writeShellScriptBin "nrs" ''
       sudo nixos-rebuild switch -I nixos-config=$HOME/.config/home-manager/configuration.nix
     '')
+    prismlauncher
+    jdk22 # for prismlauncher
+    nsxiv
+    pinta
+    jetbrains.idea-community-bin
+    zathura
+    nil # nix language server
   ];
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
@@ -186,12 +194,30 @@
   programs.neovim = {
     enable = true;
     defaultEditor = true;
+    plugins = (with pkgs.vimPlugins; [
+      telescope-nvim
+      telescope-ui-select-nvim
+      nvim-lspconfig
+      nvim-treesitter
+      rose-pine
+      vim-fugitive
+      vim-sexp
+      conjure
+    ]) ++ (with pkgs.vimPlugins.nvim-treesitter-parsers; [
+      lua python java clojure haskell bash json yaml go
+    ]);
+    extraConfig = ''
+      lua  << CONFIG_END
+      ${lib.fileContents ./nvim/init.lua}
+      CONFIG_END
+    '';
   };
 
   programs.git = {
     enable = true;
     userName = "Oli Solomons";
     userEmail = "oli.solomons@gmail.com";
+    ignores = [ ".envrc" ".direnv" ".nvim.lua" ];
     extraConfig = {
       init.defaultBranch = "main";
     };
@@ -199,9 +225,15 @@
   programs.tmux = {
     enable = true;
     terminal = "tmux-256color";
+    keyMode = "vi";
     extraConfig = ''
       set -g status off
     '';
+  };
+  programs.direnv = {
+    enable = true;
+    enableBashIntegration = true; # see note on other shells below
+    nix-direnv.enable = true;
   };
 
   programs.bash.enable = true;
