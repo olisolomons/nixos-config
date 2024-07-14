@@ -234,6 +234,8 @@
       yaml
       go
       nix
+      vim
+      vimdoc
     ]);
     extraConfig = ''
       lua  << CONFIG_END

@@ -3,6 +3,7 @@ vim.g.maplocalleader = ","
 
 -- opts
 vim.opt.relativenumber = true
+vim.opt.hlsearch = false
 
 vim.opt.exrc = true -- run .nvim.lua files
 
@@ -44,9 +45,19 @@ vim.api.nvim_create_autocmd('FileType', {
 
 local builtin = require('telescope.builtin')
 
+require("telescope").setup {
+  extensions = {
+    ["ui-select"] = {
+      require("telescope.themes").get_dropdown {}
+    }
+  }
+}
+
 vim.keymap.set('n', '<leader>pf', builtin.find_files, {})
 vim.keymap.set('n', '<C-p>', builtin.git_files, {})
 vim.keymap.set('n', '<leader>ps', builtin.live_grep, {})
+
+require("telescope").load_extension("ui-select")
 
 -- colorscheme
 
