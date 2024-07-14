@@ -233,6 +233,7 @@
       json
       yaml
       go
+      nix
     ]);
     extraConfig = ''
       lua  << CONFIG_END

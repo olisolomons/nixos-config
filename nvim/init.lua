@@ -2,8 +2,9 @@ vim.g.mapleader = " "
 vim.g.maplocalleader = ","
 
 -- opts
+vim.opt.relativenumber = true
 
-vim.opt.exrc = true
+vim.opt.exrc = true -- run .nvim.lua files
 
 vim.opt.expandtab = true
 vim.opt.smartindent = true
@@ -18,6 +19,27 @@ vim.opt.scrolloff = 8
 vim.opt.signcolumn = "yes"
 vim.opt.isfname:append("@-@")
 
+-- indent stuff
+
+local only_2_tabs = {
+  clojure = true,
+  lua = true,
+  nix = true
+}
+
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = { "*" },
+  callback = function(args)
+    local ft = vim.bo[args.buf].filetype
+    local tabs = 4
+    if only_2_tabs[ft] then
+      tabs = 2
+    end
+    vim.bo.tabstop = tabs
+    vim.bo.softtabstop = tabs
+    vim.bo.shiftwidth = tabs
+  end
+})
 -- Telescope
 
 local builtin = require('telescope.builtin')
@@ -33,6 +55,9 @@ vim.cmd("colorscheme rose-pine")
 -- treesitter
 
 require 'nvim-treesitter.configs'.setup {
+  ensure_installed = {},
+  ignore_install = {},
+  modules = {},
   -- Install parsers synchronously (only applied to `ensure_installed`)
   sync_install = true,
   -- Parsers are managed by nix home-manager
@@ -66,16 +91,15 @@ require 'nvim-treesitter.configs'.setup {
 
 local lspconfig = require('lspconfig')
 
-lspconfig.nil_ls.setup { }
+lspconfig.nil_ls.setup {}
 
-lspconfig.pyright.setup { }
+lspconfig.pyright.setup {}
 
-lspconfig.clojure_lsp.setup { }
+lspconfig.clojure_lsp.setup {}
 
-lspconfig.ocamllsp.setup { }
+lspconfig.ocamllsp.setup {}
 
 lspconfig.lua_ls.setup {
-  capabilities = capabilities,
   settings = {
     Lua = {
       runtime = {
@@ -108,7 +132,7 @@ lspconfig.lua_ls.setup {
   },
 }
 
-lspconfig.gopls.setup{}
+lspconfig.gopls.setup {}
 
 vim.api.nvim_create_autocmd('LspAttach', {
   group = vim.api.nvim_create_augroup('UserLspConfig', {}),
@@ -129,4 +153,3 @@ vim.api.nvim_create_autocmd('LspAttach', {
     vim.keymap.set('n', '<leader>S', builtin.lsp_dynamic_workspace_symbols, opts)
   end,
 })
-
