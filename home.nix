@@ -202,6 +202,7 @@
               "browser.newtabpage.enabled" = "false";
               "browser.aboutConfig.showWarning" = false;
               "browser.toolbars.bookmarks.visibility" = "never";
+              "media.videocontrols.picture-in-picture.enabled" = false;
             };
           extensions = with nur.repos.rycee.firefox-addons; [
             ublock-origin
