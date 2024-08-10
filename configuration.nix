@@ -62,11 +62,12 @@
     };
     displayManager.sessionCommands = ''
       xset -dpms  # Disable Energy Star, as we are going to suspend anyway and it may hide "success" on that
-      xset s -1 # seconds
-      ${pkgs.lightlocker}/bin/light-locker &
+      xset s off # seconds
+      ${pkgs.lightlocker}/bin/light-locker --no-lock-on-lid --lock-after-screensaver=0 &
     '';
   };
 
+  services.logind.lidSwitchExternalPower = "ignore";
   services.displayManager = { defaultSession = "none+i3"; };
 
   # Configure keymap in X11

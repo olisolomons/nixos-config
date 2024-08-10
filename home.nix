@@ -33,8 +33,11 @@
     pinta
     jetbrains.idea-community-bin
     zathura
+    vlc
+    ffmpeg
     nil # nix language server
     nixfmt-classic
+    caffeine-ng # for command-line usage, see service below
   ];
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
@@ -86,6 +89,7 @@
           l = "exec loginctl lock-session, mode default";
           u = "exec systemctl poweroff";
           r = "exec systemctl reboot";
+          h = "exec systemctl hibernate, mode default";
           "Shift+l" = "exec pkill -u $USER, mode default";
 
           Escape = "mode default";
@@ -269,6 +273,7 @@
   programs.bash.enable = true;
 
   services.keybase.enable = true;
+  services.caffeine.enable = true;
 
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
