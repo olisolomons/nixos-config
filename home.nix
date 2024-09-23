@@ -20,20 +20,25 @@
   home.packages = with pkgs; [
     xclip
     alacritty
+    
     jq
     ripgrep
     tree
     gnumake
+    unzip zip
+
     (writeShellScriptBin "nrs" ''
       sudo nixos-rebuild switch -I nixos-config=$HOME/.config/home-manager/configuration.nix
     '')
     prismlauncher
     jdk22 # for prismlauncher
+
     nsxiv
     pinta
     jetbrains.idea-community-bin
     zathura
     vlc
+
     ffmpeg
     nil # nix language server
     nixfmt-classic
