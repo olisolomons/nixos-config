@@ -102,7 +102,15 @@ require 'nvim-treesitter.configs'.setup {
 
 local lspconfig = require('lspconfig')
 
-lspconfig.nil_ls.setup {}
+lspconfig.nil_ls.setup {
+  settings = {
+    ["nil"] = {
+      formatting = {
+        command = { "nixfmt" }
+      }
+    }
+  }
+}
 
 lspconfig.pyright.setup {}
 
