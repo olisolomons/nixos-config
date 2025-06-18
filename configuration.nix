@@ -77,6 +77,12 @@
     options = "caps:ctrl_modifier";
   };
 
+  qt = {
+    enable = true;
+    platformTheme = "gnome";
+    style = "adwaita-dark";
+  };
+
   # Configure console keymap
   console.keyMap = "uk";
   # touchpad scroll
@@ -86,7 +92,7 @@
   services.printing.enable = true;
 
   # Enable sound with pipewire.
-  hardware.pulseaudio.enable = false;
+  services.pulseaudio.enable = false;
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
@@ -137,6 +143,7 @@
   #   enable = true;
   #   enableSSHSupport = true;
   # };
+  programs.dconf.enable = true; 
 
   # List services that you want to enable:
 

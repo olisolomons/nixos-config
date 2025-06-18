@@ -20,22 +20,22 @@
   home.packages = with pkgs; [
     xclip
     alacritty
-    
+
     jq
     ripgrep
     tree
     gnumake
-    unzip zip
+    unzip
+    zip
 
     (writeShellScriptBin "nrs" ''
       sudo nixos-rebuild switch -I nixos-config=$HOME/.config/home-manager/configuration.nix
     '')
     prismlauncher
-    jdk22 # for prismlauncher
+    jdk21 # for prismlauncher
 
     nsxiv
     pinta
-    jetbrains.idea-community-bin
     zathura
     vlc
 
@@ -213,7 +213,7 @@
               "browser.toolbars.bookmarks.visibility" = "never";
               "media.videocontrols.picture-in-picture.enabled" = false;
             };
-          extensions = with nur.repos.rycee.firefox-addons; [
+          extensions.packages = with nur.repos.rycee.firefox-addons; [
             ublock-origin
             bitwarden
           ];
