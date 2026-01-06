@@ -3,35 +3,17 @@
 
   inputs = {
     # The nixpkgs channels
-    nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-23.05";
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
+    nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
 
     # Home-manager following the unstable channel
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
-    # The Emacs overlay
-    emacs-overlay.url = "github:nix-community/emacs-overlay";
-
-    # The QChem flake. Contains several quantum chemistry packages
-    qchem-overlay.url = "github:Nix-QChem/NixOS-QChem";
-
-    # Ranger-like nix config inspector
-    nix-inspect.url = "github:bluskript/nix-inspect";
-
-    # The best bibliography manager ever
-    papis.url = "github:papis/papis";
-
-    # The best window manager I know
-    qtile-flake = {
-      url = "github:qtile/qtile";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
-  outputs = { self, nixpkgs, home-manager, qtile-flake, ... }@inputs:
+  outputs = { self, nixpkgs, home-manager, ... }@inputs:
     let
       system = "x86_64-linux";
       pkgs = import nixpkgs {
@@ -40,42 +22,33 @@
       };
       # Nest stable channel into default unstable
       overlay-stable = final: prev: {
-        nixpkgs-stable = import inputs.nixpkgs-stable {
+        nixpkgs-unstable = import inputs.nixpkgs-unstable {
           inherit system;
           config.allowUnfree = true;
         };
       };
-
-      # Systems and users (Bergman's reference here)
-      persona = "loren";
-      rechnerNixOS = "cyrus";
-      rechnerNonNixOS = "atabey";
     in
       {
-        nixosConfigurations = {
-          ${rechnerNixOS} = nixpkgs.lib.nixosSystem {
-            inherit system;
-            specialArgs = { inherit inputs; };
-            modules = [
-              ({ config, pkgs, ... }: { nixpkgs.overlays = [ overlay-stable ]; })
-              ./systems/${rechnerNixOS}/configuration.nix
-              home-manager.nixosModules.home-manager
-              {
-                home-manager.useGlobalPkgs = true;
-                home-manager.users.${persona} = ./home/${rechnerNixOS}/home.nix;
-              }
-            ];
-          };
-        };
-
-        homeConfigurations.${persona} = home-manager.lib.homeManagerConfiguration {
-          inherit pkgs;
-          extraSpecialArgs = { inherit inputs; };
-          modules = [
-            ./home/${rechnerNonNixOS}/home.nix
-          ];
-        };
-
-        packages.${system}.${persona} = self.homeConfigurations.${persona}.activationPackage;
+    # NixOS configuration entrypoint
+    # Available through 'nixos-rebuild --flake .#oli'
+    nixosConfigurations = {
+      oli = nixpkgs.lib.nixosSystem {
+        specialArgs = {inherit inputs;};
+        # > Our main nixos configuration file <
+        modules = [./nixos/configuration.nix];
       };
+    };
+
+    # Standalone home-manager configuration entrypoint
+    # Available through 'home-manager --flake .#oli'
+    homeConfigurations = {
+      oli = home-manager.lib.homeManagerConfiguration {
+        # Home-manager requires 'pkgs' instance
+        pkgs = nixpkgs.legacyPackages.x86_64-linux;
+        extraSpecialArgs = {inherit inputs;};
+        # > Our main home-manager configuration file <
+        modules = [./home-manager/home.nix];
+      };
+    };
+  };
 }
