@@ -1,6 +1,5 @@
-{ pkgs, lib, ... }:
-let unstable = pkgs.nixos-unstable;
-in {
+{ pkgs, lib, unstable, ... }@inputs:
+{
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
   home.username = "oli";
@@ -28,7 +27,7 @@ in {
       sudo nixos-rebuild switch -I nixos-config=$HOME/.config/home-manager/configuration.nix
     '')
     prismlauncher
-    jdk22 # for prismlauncher
+    jdk24 # for prismlauncher
     nsxiv
     pinta
     jetbrains.idea-community-bin
@@ -66,6 +65,10 @@ in {
             "--no-startup-id ${pkgs.networkmanagerapplet}/bin/nm-applet";
         }
         { command = "--no-startup-id ${pkgs.pasystray}/bin/pasystray"; }
+        { command = "--no-startup-id blueman-applet"; }
+        { command = "--no-startup-id dbus-update-activation-environment --systemd DISPLAY I3SOCK XDG_CURRENT_DESKTOP=i3"; }
+        { command = "--no-startup-id systemctl --user import-environment DISPLAY I3SOCK XDG_CURRENT_DESKTOP=i3"; }
+        { command = "--no-startup-id /run/current-system/sw/libexec/xdg-desktop-portal-gtk"; }
       ];
       keybindings = lib.mkOptionDefault {
         "${modifier}+Tab" = "focus right";
@@ -135,7 +138,6 @@ in {
       };
     };
     # start on workspace 1
-    extraConfig = "exec i3-msg workspace 1";
   };
 
   services.flameshot = {
@@ -155,13 +157,6 @@ in {
       Value = true;
       Status = "locked";
     };
-    nur = import (builtins.fetchTarball {
-      # Get the revision by choosing a version from https://github.com/nix-community/NUR/commits/master
-      url =
-        "https://github.com/nix-community/NUR/archive/e8f2bc12692938b61f559d946204c4caceed8af9.tar.gz";
-      # Get the hash by running `nix-prefetch-url --unpack <url>` on the above url
-      sha256 = "18yx1bj9d4y70c6ff0101qprnwfq1r74b8705c9ibvq1vnav5a50";
-    }) { inherit pkgs; };
   in {
     enable = true;
     policies = {
@@ -220,10 +215,10 @@ in {
               "browser.toolbars.bookmarks.visibility" = "never";
               "media.videocontrols.picture-in-picture.enabled" = false;
             };
-          extensions = with nur.repos.rycee.firefox-addons; [
-            ublock-origin
-            bitwarden
-          ];
+         extensions.packages = with pkgs.nur.repos.rycee.firefox-addons; [
+           ublock-origin
+           bitwarden
+         ];
         };
     };
   };
@@ -286,6 +281,7 @@ in {
 
   programs.bash.enable = true;
 
+  services.dunst.enable = true;
   services.keybase.enable = true;
   services.caffeine.enable = true;
 

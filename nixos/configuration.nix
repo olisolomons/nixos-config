@@ -96,6 +96,21 @@
     alsa.enable = true;
     alsa.support32Bit = true;
     pulse.enable = true;
+    wireplumber.enable = true;
+    services.pipewire.extraConfig.pipewire."10-clock-rate" = {
+      "context.properties" = {
+        # 48000 is the most stable for modern Bluetooth + Browsers
+        "default.clock.rate" = 48000;
+        "default.clock.allowed-rates" = [ 48000 ];
+      };
+    };
+    services.pipewire.wireplumber.extraConfig."10-bluez-standard" = {
+      "monitor.bluez.properties" = {
+        # Temporarily disable mSBC to see if standard CVSD works
+        "bluez5.enable-msbc" = false;
+        "bluez5.enable-sbc-xq" = false;
+      };
+    };
     # If you want to use JACK applications, uncomment this
     #jack.enable = true;
 
@@ -129,13 +144,33 @@
   };
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
-  hardware.bluetooth.enable = true;
+  hardware.bluetooth = {
+    enable = true;
+    settings.General = { Enable = "Source,Sink,Media,Socket"; };
+  };
   hardware.bluetooth.powerOnBoot = true;
   services.blueman.enable = true;
+  xdg.portal = {
+    enable = true;
+    extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+    config.common.default = "*";
+  };
+
+  environment.pathsToLink = [ "/libexec" ];
   # List packages installed in system profile. To search, run:
   # $ nix search wget
-  environment.systemPackages = with pkgs; [
-   git];
+  environment.systemPackages = with pkgs; [ git ];
+  services.pipewire.extraConfig.pipewire."99-buffer-fix" = {
+    "context.properties" = {
+      # Increases the minimum buffer size to prevent "out of buffers"
+      "default.clock.min-quantum" = 512;
+      "default.clock.max-quantum" = 2048;
+    };
+  };
+
+  services.pipewire.extraConfig.pipewire-pulse."99-pulse-buffer" = {
+    "pulse.properties" = { "pulse.min.quantum" = "512/48000"; };
+  };
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.

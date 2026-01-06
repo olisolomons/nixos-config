@@ -100,17 +100,15 @@ require 'nvim-treesitter.configs'.setup {
 
 -- LSP
 
-local lspconfig = require('lspconfig')
+vim.lsp.config('nil_ls', {})
 
-lspconfig.nil_ls.setup {}
+vim.lsp.config('pyright', {})
 
-lspconfig.pyright.setup {}
+vim.lsp.config('clojure_lsp', {})
 
-lspconfig.clojure_lsp.setup {}
+vim.lsp.config('ocamllsp', {})
 
-lspconfig.ocamllsp.setup {}
-
-lspconfig.lua_ls.setup {
+vim.lsp.config('lua_ls', {
   settings = {
     Lua = {
       runtime = {
@@ -141,9 +139,9 @@ lspconfig.lua_ls.setup {
       },
     },
   },
-}
+})
 
-lspconfig.gopls.setup {}
+vim.lsp.config('gopls', {})
 
 vim.api.nvim_create_autocmd('LspAttach', {
   group = vim.api.nvim_create_augroup('UserLspConfig', {}),
