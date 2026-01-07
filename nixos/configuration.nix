@@ -1,7 +1,7 @@
 # Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ pkgs, ... }:
+{ pkgs, config, ... }:
 
 {
   imports = [ # Include the results of the hardware scan.
@@ -97,20 +97,6 @@
     alsa.support32Bit = true;
     pulse.enable = true;
     wireplumber.enable = true;
-    services.pipewire.extraConfig.pipewire."10-clock-rate" = {
-      "context.properties" = {
-        # 48000 is the most stable for modern Bluetooth + Browsers
-        "default.clock.rate" = 48000;
-        "default.clock.allowed-rates" = [ 48000 ];
-      };
-    };
-    services.pipewire.wireplumber.extraConfig."10-bluez-standard" = {
-      "monitor.bluez.properties" = {
-        # Temporarily disable mSBC to see if standard CVSD works
-        "bluez5.enable-msbc" = false;
-        "bluez5.enable-sbc-xq" = false;
-      };
-    };
     # If you want to use JACK applications, uncomment this
     #jack.enable = true;
 
@@ -160,16 +146,17 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [ git ];
-  services.pipewire.extraConfig.pipewire."99-buffer-fix" = {
-    "context.properties" = {
-      # Increases the minimum buffer size to prevent "out of buffers"
-      "default.clock.min-quantum" = 512;
-      "default.clock.max-quantum" = 2048;
-    };
-  };
 
-  services.pipewire.extraConfig.pipewire-pulse."99-pulse-buffer" = {
-    "pulse.properties" = { "pulse.min.quantum" = "512/48000"; };
+  # Enable the Intel IPU6 camera stack
+  hardware.ipu6.enable = true;
+  hardware.ipu6.platform = "ipu6ep"; # For Raptor Lake (13th Gen)
+  hardware.enableAllFirmware = true;
+  # 1. Enable Visual Sensing (Crucial for 13th Gen)
+  hardware.firmware = [ pkgs.ivsc-firmware ];
+  hardware.sensor.iio.enable = true;
+  services.pipewire.wireplumber.extraConfig."10-ipu6-libcamera" = {
+    "monitor.libcamera" = "enabled"; # Change from "required" to "enabled"
+    "monitor.v4l2" = "disabled"; # Keep this disabled to avoid double-probing
   };
 
   # Some programs need SUID wrappers, can be configured further or are
