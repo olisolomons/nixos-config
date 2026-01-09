@@ -1,8 +1,8 @@
-{ pkgs, lib, unstable, ... }@inputs:
+{ pkgs, lib, unstable, ... }:
 let
-  extensionUuid = "i3mode@nixos.local";
+  i3ModeExtensionUuid = "i3mode@nixos.local";
 
-  myExtension = pkgs.stdenv.mkDerivation {
+  i3ModeExtension = pkgs.stdenv.mkDerivation {
     name = "gnome-extension-i3-mode";
     src = ./i3-mode-extension;
 
@@ -11,15 +11,14 @@ let
 
     installPhase = ''
       # Define the target directory
-      export EXT_DIR=$out/share/gnome-shell/extensions/${extensionUuid}
+      export EXT_DIR=$out/share/gnome-shell/extensions/${i3ModeExtensionUuid}
       mkdir -p $EXT_DIR
 
       # Copy all files
       cp -r * $EXT_DIR
 
       # Compile the schemas inside the output directory
-      glib-compile-schemas $EXT_DIR/schemas/
-    '';
+      glib-compile-schemas $EXT_DIR/schemas/ '';
   };
 in {
   # Home Manager needs a bit of information about you and the paths it should
@@ -55,7 +54,7 @@ in {
     zoom-us
     unstable.omnissa-horizon-client
     pkgs.gnomeExtensions.appindicator
-    myExtension
+    i3ModeExtension
   ];
   home.sessionVariables = {
     XDG_DATA_DIRS = "$GSETTINGS_SCHEMA_DIR:$XDG_DATA_DIRS";
@@ -318,7 +317,7 @@ in {
       disable-user-extensions = false;
       # Add the UUID of the extension to the enabled list
       enabled-extensions =
-        [ "appindicatorsupport@rgcjonas.gmail.com" extensionUuid ];
+        [ "appindicatorsupport@rgcjonas.gmail.com" i3ModeExtensionUuid ];
     };
     # Modify existing window manager bindings
     # --- 1. DISABLE & REMAP BUILT-IN KEYS ---
@@ -330,8 +329,8 @@ in {
       switch-windows = [ ];
       switch-windows-backward = [ ];
 
-      switch-to-workspace-left = [];
-      switch-to-workspace-right = [];
+      switch-to-workspace-left = [ ];
+      switch-to-workspace-right = [ ];
     };
 
     "org/gnome/settings-daemon/plugins/media-keys" = {
