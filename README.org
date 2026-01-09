@@ -1,80 +1,16 @@
-#+BEGIN_HTML
-<a href="https://raw.githubusercontent.com/Panadestein/nixos-config/main/LICENSE.md">
-<img alt="GPLv3" src="https://img.shields.io/github/license/Panadestein/nixos-config" />
-</a>
-
-<a href="https://builtwithnix.org">
-<img alt="Build with Nix" src="https://builtwithnix.org/badge.svg" />
-</a>
-#+END_HTML
-
-* Panadestein's Nix/NixOS Configuration
-
-#+BEGIN_HTML
-<div>
-    <img src="./home/dotfiles/images/some_apps.png" style="width:48%; margin-right:2%;">
-    <img src="./home/dotfiles/images/my_shells.png" style="width:48%;">
-</div>
-#+END_HTML
-
-Welcome to my personal flake [[https://nixos.org/][Nix/NixOS]] configuration, powered by [[https://nix-community.github.io/home-manager/][home-manager]]. This configuration
-is designed to be production-ready (according to my personal requirements) and comes with the [[https://xmonad.org/][xmonad]] and [[https://qtile.org/screenshots/][Qtile]]
-tiling window managers. Additionally, I have a declarative configuration for the [[https://release.gnome.org/][gnome]]
-desktop environment, although it's not my primary environment.
-
-** Remarks:
-
-This configuration is specifically tailored for AMD hardware, hence, modifications might
-be necessary to suit other machines.
-
-*** Using flakes
-
-Nix [[https://www.tweag.io/blog/2020-07-31-nixos-flakes/][flakes]] is the preferred way to utilize this configuration. The use of flakes enhances the reproducibility
-of the system and enables seamless support for multiple machines via the =flake.nix= file.
+* Oli's NixOS Configuration
 
 **** NixOS
 
-My NixOS machine is called [[https://en.wikipedia.org/wiki/Cyrus_Smith][cyrus]]. Here I build the home and system configuration together as follows:
-
+Useful commands:
 #+begin_src bash
-  sudo nixos-rebuild --flake .#<HOSTNAME> switch
+  sudo nixos-rebuild --flake .#oli switch
 #+end_src
-
-Upgrading the system implies updating the inputs one at the time:
-
-#+begin_src bash
-  sudo nix flake lock --update-input <INPUT>
-#+end_src
-
-or all of them together:
 
 #+begin_src bash
   nix flake update
 #+end_src
 
-**** Non-NixOS
-
-I maintain a second configuration for non-NixOS hosts (tested in Guix System so far), which is
-called [[https://en.wikipedia.org/wiki/Atabey_(goddess)][atabey]]. Here I build only the home configuration:
-
 #+begin_src bash
-  nix build .#<USERNAME>
-  ./result/activate
-#+end_src
-
-*** Using nix-channels
-
-The flake configuration can be easily transformed into a non-flake, channel based one.
-For example, if you want to use the =nixos-unstable= you could do:
-
-#+begin_src bash
-  sudo nix-channel --add https://nixos.org/channels/nixos-unstable nixos
-  sudo nixos-rebuild switch --upgrade
-#+end_src
-
-When using a hybrid workflow (e.g. to keep using =nix-shell= in a flake system)
-it is important to update the channels without rebuilding:
-
-#+begin_src bash
-  nix-channel --update
+  home-manager switch --flake .#oli
 #+end_src
