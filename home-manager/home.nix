@@ -1,5 +1,27 @@
 { pkgs, lib, unstable, ... }@inputs:
-{
+let
+  extensionUuid = "i3mode@nixos.local";
+
+  myExtension = pkgs.stdenv.mkDerivation {
+    name = "gnome-extension-i3-mode";
+    src = ./i3-mode-extension;
+
+    # Add glib to build inputs to get the compiler
+    nativeBuildInputs = [ pkgs.glib ];
+
+    installPhase = ''
+      # Define the target directory
+      export EXT_DIR=$out/share/gnome-shell/extensions/${extensionUuid}
+      mkdir -p $EXT_DIR
+
+      # Copy all files
+      cp -r * $EXT_DIR
+
+      # Compile the schemas inside the output directory
+      glib-compile-schemas $EXT_DIR/schemas/
+    '';
+  };
+in {
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
   home.username = "oli";
@@ -23,21 +45,21 @@
     ripgrep
     tree
     gnumake
-    (writeShellScriptBin "nrs" ''
-      sudo nixos-rebuild switch -I nixos-config=$HOME/.config/home-manager/configuration.nix
-    '')
-    prismlauncher
-    jdk24 # for prismlauncher
     nsxiv
     pinta
-    jetbrains.idea-community-bin
     zathura
     vlc
     ffmpeg
     nil # nix language server
     nixfmt-classic
-    caffeine-ng # for command-line usage, see service below
+    zoom-us
+    unstable.omnissa-horizon-client
+    pkgs.gnomeExtensions.appindicator
+    myExtension
   ];
+  home.sessionVariables = {
+    XDG_DATA_DIRS = "$GSETTINGS_SCHEMA_DIR:$XDG_DATA_DIRS";
+  };
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
   # plain files is through 'home.file'.
@@ -66,9 +88,6 @@
         }
         { command = "--no-startup-id ${pkgs.pasystray}/bin/pasystray"; }
         { command = "--no-startup-id blueman-applet"; }
-        { command = "--no-startup-id dbus-update-activation-environment --systemd DISPLAY I3SOCK XDG_CURRENT_DESKTOP=i3"; }
-        { command = "--no-startup-id systemctl --user import-environment DISPLAY I3SOCK XDG_CURRENT_DESKTOP=i3"; }
-        { command = "--no-startup-id /run/current-system/sw/libexec/xdg-desktop-portal-gtk"; }
       ];
       keybindings = lib.mkOptionDefault {
         "${modifier}+Tab" = "focus right";
@@ -132,6 +151,10 @@
         launch = {
           f = "exec firefox, mode default";
           t = "exec alacritty, mode default";
+          v =
+            "exec --no-startup-id obs --startvirtualcam --minimize-to-tray --safe-mode, mode default";
+          "Shift+v" = "exec --no-startup-id pkill obs, mode default";
+          c = "exec chromium, mode default";
 
           Escape = "mode default";
         };
@@ -214,12 +237,11 @@
               "browser.newtabpage.enabled" = "false";
               "browser.aboutConfig.showWarning" = false;
               "browser.toolbars.bookmarks.visibility" = "never";
-              "media.videocontrols.picture-in-picture.enabled" = false;
             };
-         extensions.packages = with pkgs.nur.repos.rycee.firefox-addons; [
-           ublock-origin
-           bitwarden
-         ];
+          extensions.packages = with pkgs.nur.repos.rycee.firefox-addons; [
+            ublock-origin
+            bitwarden
+          ];
         };
     };
   };
@@ -261,10 +283,15 @@
 
   programs.git = {
     enable = true;
-    userName = "Oli Solomons";
-    userEmail = "oli.solomons@gmail.com";
     ignores = [ ".envrc" ".direnv" ".nvim.lua" ];
-    extraConfig = { init.defaultBranch = "main"; };
+    settings = {
+      user = {
+        name = "Oli Solomons";
+        email = "oli.solomons@gmail.com";
+
+      };
+      init.defaultBranch = "main";
+    };
   };
   programs.tmux = {
     enable = true;
@@ -283,8 +310,40 @@
   programs.bash.enable = true;
 
   services.dunst.enable = true;
-  services.keybase.enable = true;
   services.caffeine.enable = true;
+
+  dconf.settings = {
+    "org/gnome/desktop/input-sources" = { xkb-options = [ "ctrl:nocaps" ]; };
+    "org/gnome/shell" = {
+      disable-user-extensions = false;
+      # Add the UUID of the extension to the enabled list
+      enabled-extensions =
+        [ "appindicatorsupport@rgcjonas.gmail.com" extensionUuid ];
+    };
+    # Modify existing window manager bindings
+    # --- 1. DISABLE & REMAP BUILT-IN KEYS ---
+    "org/gnome/desktop/wm/keybindings" = {
+      # Remove Alt+Tab, Keep Super+Tab
+      switch-applications = [ "<Super>Tab" ];
+      switch-applications-backward = [ "<Shift><Super>Tab" ];
+      # Completely disable Alt+Tab variants
+      switch-windows = [ ];
+      switch-windows-backward = [ ];
+
+      switch-to-workspace-left = [];
+      switch-to-workspace-right = [];
+    };
+
+    "org/gnome/settings-daemon/plugins/media-keys" = {
+      # Disable the default Logout (Ctrl+Alt+Del)
+      logout = [ ];
+    };
+
+    "org/gnome/shell/extensions/i3mode" = {
+      launch-mode = [ "<Super>r" ];
+      power-mode = [ "<Super>x" ];
+    };
+  };
 
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;

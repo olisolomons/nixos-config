@@ -41,37 +41,8 @@
     LC_TIME = "en_GB.UTF-8";
   };
 
-  # X11 + i3 window manager
-  services.xserver = {
-    enable = true;
-    windowManager.i3.enable = true;
-
-    displayManager.lightdm = {
-      enable = true;
-      greeters.mini = {
-        enable = true;
-        user = "oli";
-        extraConfig = ''
-          [greeter]
-          show-password-label = false
-          password-alignment = left
-          [greeter-theme]
-          background-image-size = 10px, 10px
-        '';
-      };
-
-    };
-    displayManager.sessionCommands = ''
-      xset -dpms  # Disable Energy Star, as we are going to suspend anyway and it may hide "success" on that
-      xset s off # seconds
-      ${pkgs.lightlocker}/bin/light-locker --no-lock-on-lid --lock-after-screensaver=0 &
-    '';
-
-    dpi = 180;
-  };
-
-  services.logind.lidSwitchExternalPower = "ignore";
-  services.displayManager = { defaultSession = "none+i3"; };
+  services.displayManager.gdm.enable = true;
+  services.desktopManager.gnome.enable = true;
 
   # Configure keymap in X11
   services.xserver.xkb = {
@@ -130,10 +101,7 @@
   };
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
-  hardware.bluetooth = {
-    enable = true;
-    settings.General = { Enable = "Source,Sink,Media,Socket"; };
-  };
+  hardware.bluetooth = { enable = true; };
   hardware.bluetooth.powerOnBoot = true;
   services.blueman.enable = true;
   xdg.portal = {
@@ -145,7 +113,7 @@
   environment.pathsToLink = [ "/libexec" ];
   # List packages installed in system profile. To search, run:
   # $ nix search wget
-  environment.systemPackages = with pkgs; [ git ];
+  environment.systemPackages = with pkgs; [ git v4l-utils obs-studio gnomeExtensions.appindicator ];
 
   # Enable the Intel IPU6 camera stack
   hardware.ipu6.enable = true;
@@ -158,6 +126,13 @@
     "monitor.libcamera" = "enabled"; # Change from "required" to "enabled"
     "monitor.v4l2" = "disabled"; # Keep this disabled to avoid double-probing
   };
+  # 1. Enable the virtual webcam kernel module
+  boot.extraModulePackages = [ config.boot.kernelPackages.v4l2loopback ];
+  boot.kernelModules = [ "v4l2loopback" ];
+  # We use video_nr=20 to avoid any conflicts with the existing IPU6 nodes
+  boot.extraModprobeConfig = ''
+    options v4l2loopback devices=1 video_nr=20 card_label="Zoom-Camera" exclusive_caps=1
+  '';
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
