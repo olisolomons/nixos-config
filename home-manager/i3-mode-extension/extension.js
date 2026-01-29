@@ -23,6 +23,7 @@ export default class I3ModeExtension extends Extension {
         
         if (!grab) return;
 
+
         let eventId = global.stage.connect('key-press-event', (actor, event) => {
             let symbol = event.get_key_symbol();
             let unicode = Clutter.keysym_to_unicode(symbol);
@@ -33,6 +34,8 @@ export default class I3ModeExtension extends Extension {
             } else if (map[keyName]) {
                 console.log(`I3-MODE: Action for ${keyName}`);
                 map[keyName]();
+            } else {
+                console.log(`I3-MODE: No action for ${symbol}`)
             }
 
             global.stage.disconnect(eventId);
@@ -46,7 +49,7 @@ export default class I3ModeExtension extends Extension {
         't': () => this._launchApp('alacritty.desktop'),
         'c': () => this._launchApp('chromium.desktop'),
         'v': () => Util.trySpawnCommandLine('obs --startvirtualcam --minimize-to-tray'),
-        'V': () => Util.trySpawnCommandLine('pkill obs'), // The requested Kill command
+        'V': () => Util.trySpawnCommandLine('pkill obs'),
     };
 
     _powerMap = {
@@ -55,17 +58,6 @@ export default class I3ModeExtension extends Extension {
         'u': () => Util.spawnCommandLine('systemctl poweroff'),
         'r': () => Util.spawnCommandLine('systemctl reboot'),
     };
-
-    _launchApp(desktopId) {
-        let app = Shell.AppSystem.get_default().lookup_app(desktopId);
-        if (app) {
-            app.activate();
-        } else {
-            console.error(`I3-MODE: Could not find app ${desktopId}`);
-            // Fallback for NixOS if desktop file naming is weird
-            Util.trySpawnCommandLine(desktopId.replace('.desktop', ''));
-        }
-    }
 
     disable() {
         Main.wm.removeKeybinding('launch-mode');

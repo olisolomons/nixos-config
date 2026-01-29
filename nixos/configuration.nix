@@ -104,11 +104,11 @@
   hardware.bluetooth = { enable = true; };
   hardware.bluetooth.powerOnBoot = true;
   services.blueman.enable = true;
-  xdg.portal = {
-    enable = true;
-    extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
-    config.common.default = "*";
-  };
+  # xdg.portal = {
+  #   enable = true;
+  #   extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+  #   config.common.default = "*";
+  # };
 
   environment.pathsToLink = [ "/libexec" ];
   # List packages installed in system profile. To search, run:
