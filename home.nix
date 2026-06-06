@@ -18,6 +18,7 @@
   # The home.packages option allows you to install Nix packages into your
   # environment.
   home.packages = with pkgs; [
+    teamviewer
     xclip
     alacritty
 
@@ -253,13 +254,14 @@
       CONFIG_END
     '';
   };
-
   programs.git = {
     enable = true;
-    userName = "Oli Solomons";
-    userEmail = "oli.solomons@gmail.com";
+    settings = {
+      user.email = "oli.solomons@gmail.com";
+      user.name = "Oli Solomons";
+      init.defaultBranch = "main";
+    };
     ignores = [ ".envrc" ".direnv" ".nvim.lua" ];
-    extraConfig = { init.defaultBranch = "main"; };
   };
   programs.tmux = {
     enable = true;
@@ -282,4 +284,5 @@
 
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
+  nixpkgs.config.allowUnfree = true;
 }
