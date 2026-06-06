@@ -1,0 +1,40 @@
+* Oli's NixOS Configuration
+
+Two machines managed from one flake: =adele= (desktop, i3) and =dell-xps= (laptop, GNOME).
+
+Home Manager runs as a NixOS module — one command applies everything.
+
+**** First-time setup (new machine)
+
+1. Clone this repo to =~/src/nixos-config=
+2. Copy =hosts/<name>/hardware-configuration.nix= from the new machine or create a new host directory
+3. Run the initial rebuild manually:
+
+#+begin_src bash
+  cd ~/src/nixos-config
+  sudo nixos-rebuild --flake .#<hostname> switch
+#+end_src
+
+4. After the first rebuild, the =nrs= script will be in your PATH
+
+**** Apply configuration
+
+Once home-manager is configured, use the =nrs= script from anywhere:
+
+#+begin_src bash
+  nrs                 # Auto-detects hostname and applies config
+  nrs --show-trace    # With extra arguments
+#+end_src
+
+Or run manually from the repo:
+
+#+begin_src bash
+  sudo nixos-rebuild --flake .#adele switch
+  sudo nixos-rebuild --flake .#dell-xps switch
+#+end_src
+
+**** Update flake inputs
+
+#+begin_src bash
+  nix flake update
+#+end_src

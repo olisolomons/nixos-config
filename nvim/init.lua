@@ -63,89 +63,43 @@ require("telescope").load_extension("ui-select")
 
 vim.cmd("colorscheme rose-pine")
 
--- treesitter
-
-require 'nvim-treesitter.configs'.setup {
-  ensure_installed = {},
-  ignore_install = {},
-  modules = {},
-  -- Install parsers synchronously (only applied to `ensure_installed`)
-  sync_install = true,
-  -- Parsers are managed by nix home-manager
-  auto_install = false,
-
-  ---- If you need to change the installation directory of the parsers (see -> Advanced Setup)
-  -- parser_install_dir = "/some/path/to/store/parsers", -- Remember to run vim.opt.runtimepath:append("/some/path/to/store/parsers")!
-
-  highlight = {
-    enable = true,
-
-    -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
-    -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
-    -- Using this option may slow down your editor, and you may see some duplicate highlights.
-    -- Instead of true it can also be a list of languages
-    additional_vim_regex_highlighting = false,
-  },
-
-  incremental_selection = {
-    enable = true,
-    keymaps = {
-      init_selection = "<C-space>",
-      node_incremental = "<C-space>",
-      scope_incremental = false,
-      node_decremental = "<M-space>",
-    }
-  }
-}
-
 -- LSP
 
-local lspconfig = require('lspconfig')
-
-lspconfig.nil_ls.setup {
+vim.lsp.enable('nil_ls')
+vim.lsp.config('nil_ls', {
   settings = {
-    ["nil"] = {
+    ['nil'] = {
       formatting = {
-        command = { "nixfmt" }
-      }
-    }
-  }
-}
+        command = { "nixfmt" },
+      },
+    },
+  },
+})
 
-lspconfig.ts_ls.setup {
-  cmd = { "npx", "typescript-language-server", "--stdio" }
-}
+vim.lsp.config('pyright', {})
 
-lspconfig.pyright.setup {}
+vim.lsp.config('clojure_lsp', {})
 
-lspconfig.clojure_lsp.setup {}
+vim.lsp.config('ocamllsp', {})
 
-lspconfig.ocamllsp.setup {}
-
-lspconfig.lua_ls.setup {
+vim.lsp.config('lua_ls', {
   settings = {
     Lua = {
       runtime = {
-        -- Tell the language server which version of Lua you're using (most likely LuaJIT in the case of Neovim)
         version = 'LuaJIT',
       },
       diagnostics = {
-        -- Get the language server to recognize the `vim` global
         globals = { 'vim' },
       },
       workspace = {
-        -- Make the server aware of Neovim runtime files
         library = vim.api.nvim_get_runtime_file("", true),
         checkThirdParty = false,
       },
-      -- Do not send telemetry data containing a randomized but unique identifier
       telemetry = {
         enable = false,
       },
       format = {
         enable = true,
-        -- Put format options here
-        -- NOTE: the value should be STRING!!
         defaultConfig = {
           indent_style = "space",
           indent_size = "2",
@@ -153,22 +107,16 @@ lspconfig.lua_ls.setup {
       },
     },
   },
-}
+})
 
-lspconfig.gopls.setup {}
+vim.lsp.config('gopls', {})
 
 vim.api.nvim_create_autocmd('LspAttach', {
   group = vim.api.nvim_create_augroup('UserLspConfig', {}),
   callback = function(ev)
-    -- Buffer local mappings.
-    -- See `:help vim.lsp.*` for documentation on any of the below functions
     local opts = { buffer = ev.buf }
-    vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
-    vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
-    vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, opts)
-    vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)
-    vim.keymap.set({ 'n', 'v' }, '<leader>ca', vim.lsp.buf.code_action, opts)
-    vim.keymap.set('n', 'gr', builtin.lsp_references, opts)
+    vim.keymap.set('n', 'gri', builtin.lsp_implementations, opts)
+    vim.keymap.set('n', 'grr', builtin.lsp_references, opts)
     vim.keymap.set('n', '<leader>f', function()
       vim.lsp.buf.format { async = true }
     end, opts)
