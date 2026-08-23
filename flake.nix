@@ -21,17 +21,14 @@
         inherit system;
         config.allowUnfree = true;
       };
-      overlays = [
-        nur.overlays.default
-      ];
+      overlays = [ nur.overlays.default ];
       hmModule = host: {
         home-manager.useGlobalPkgs = true;
         home-manager.useUserPackages = true;
         home-manager.extraSpecialArgs = { inherit inputs unstable; };
         home-manager.users.oli = import ./hosts/${host}/home.nix;
       };
-    in
-    {
+    in {
       nixosConfigurations = {
         adele = nixpkgs.lib.nixosSystem {
           inherit system;

@@ -9,13 +9,13 @@
   home.stateVersion = "24.05";
 
   home.packages = with pkgs; [
-    prismlauncher
-    jdk21
-    caffeine-ng
     unzip
     zip
     claude-code
+    nixfmt
   ];
-
-  services.keybase.enable = true;
+  programs.thunderbird = {
+    enable = true;
+    profiles = { };
+  };
 }

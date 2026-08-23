@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 
 {
   imports = [
@@ -44,6 +44,7 @@
   programs.dconf.enable = true;
 
   services.teamviewer.enable = true;
+  systemd.services.teamviewerd.wantedBy = lib.mkForce [];
 
   system.stateVersion = "24.05";
 }
