@@ -12,7 +12,6 @@
     unzip
     zip
     claude-code
-    nixfmt
   ];
   programs.thunderbird = {
     enable = true;
