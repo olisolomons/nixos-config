@@ -2,6 +2,7 @@
   pkgs,
   lib,
   unstable,
+  config,
   ...
 }:
 
@@ -61,6 +62,8 @@
       ${lib.fileContents ../../nvim/init.lua}
       CONFIG_END
     '';
+    withRuby = false;
+    withPython3 = false;
   };
 
   programs.firefox =
@@ -121,6 +124,7 @@
           bitwarden
         ];
       };
+      configPath = "${config.xdg.configHome}/mozilla/firefox";
     };
 
   programs.git = {
