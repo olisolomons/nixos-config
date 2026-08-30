@@ -47,4 +47,6 @@
   systemd.services.teamviewerd.wantedBy = lib.mkForce [];
 
   system.stateVersion = "24.05";
+
+  services.udisks2.enable = true;
 }
