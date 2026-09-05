@@ -1,6 +1,29 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 
 {
+  imports = [
+    ./hardware-configuration.nix
+  ];
+
+  networking.hostName = "annie";
+
+  services.xserver = {
+    enable = true;
+    desktopManager.xfce.enable = true;
+    displayManager.lightdm.enable = true;
+  };
+  qt = {
+    enable = true;
+    platformTheme = "gnome";
+    style = "adwaita-dark";
+  };
+
+  programs.dconf.enable = true;
+
+  services.teamviewer.enable = true;
+
+  system.stateVersion = "24.05";
+
   boot.loader.systemd-boot.enable = true;
   boot.loader.systemd-boot.configurationLimit = 5;
   boot.loader.efi.canTouchEfiVariables = true;
@@ -25,11 +48,8 @@
   services.xserver.xkb = {
     layout = "gb";
     variant = "";
-    options = "caps:ctrl_modifier";
   };
   console.keyMap = "uk";
-
-  services.libinput.touchpad.naturalScrolling = true;
 
   services.pulseaudio.enable = false;
   security.rtkit.enable = true;
@@ -41,12 +61,19 @@
     wireplumber.enable = true;
   };
 
-  users.users.oli = {
+  users.users.annie = {
     isNormalUser = true;
-    description = "oli";
-    extraGroups = [ "networkmanager" "wheel" ];
+    description = "Annie";
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+    ];
   };
 
   nixpkgs.config.allowUnfree = true;
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings.experimental-features = [
+    "nix-command"
+    "flakes"
+  ];
+
 }

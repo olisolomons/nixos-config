@@ -1,6 +1,0 @@
-{
-  "name": "Nix i3 Modal",
-  "description": "Recreates i3-style modes for Launch and Power actions",
-  "uuid": "i3mode@nixos.local",
-  "shell-version": ["44", "45", "46", "47", "48", "49"]
-}
