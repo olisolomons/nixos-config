@@ -18,25 +18,75 @@
   ];
 
   # Home Manager user configuration block
-  home-manager.users.annie = {
+  home-manager.users.annie = { config, ... }: {
+    home.file."Desktop/IN.desktop".text = ''
+      [Desktop Entry]
+      Type=Application
+      Version=1.0
+      Name=IN Document
+      Comment=Open IN.odt in LibreOffice
+      Exec=xdg-open "/home/annie/Dropbox/Documents/£/IN.odt"
+      Icon=libreoffice-writer
+      Terminal=false
+      Categories=Office;
+    '';
+
+    home.activation.createDesktopShortcuts = config.lib.dag.entryAfter [ "writeBoundary" ] ''
+      DESKTOP_FILE="$HOME/Desktop/Recipes.desktop"
+
+      # 1. Remove any old store symlink
+      $DRY_RUN_CMD rm -f "$DESKTOP_FILE"
+
+      # 2. Write standard desktop shortcut directly into user home space
+      $DRY_RUN_CMD cat << 'EOF' > "$DESKTOP_FILE"
+      [Desktop Entry]
+      Type=Application
+      Version=1.0
+      Name=Recipes
+      Comment=Open Recipes folder in Thunar
+      Exec=thunar "/home/annie/Dropbox/Recipes"
+      Icon=${./recipes.xpm}
+      Terminal=false
+      Categories=Utility;
+      EOF
+
+      # 3. Give user write permissions (clears lock emblem)
+      $DRY_RUN_CMD chmod 644 "$DESKTOP_FILE"
+    '';
+
     xfconf.settings = {
       xfce4-keyboard-shortcuts = {
         "commands/custom/<Primary><Alt>k" =
           "xfce4-terminal -e 'bash -c \"cd ~/Dropbox/Recipes; ./make.py; echo Press any key to exit.; read -n 1\"'";
         "commands/custom/Super_L" = "xfce4-popup-whiskermenu";
+        # Ctrl first, then Super
+        "xfwm4/custom/<Primary><Super>Left" = "tile_left_key";
+        "xfwm4/custom/<Primary><Super>Right" = "tile_right_key";
+        "xfwm4/custom/<Primary><Super>Up" = "maximize_window_key";
+
+        # Super first, then Ctrl
+        "xfwm4/custom/<Super><Primary>Left" = "tile_left_key";
+        "xfwm4/custom/<Super><Primary>Right" = "tile_right_key";
+        "xfwm4/custom/<Super><Primary>Up" = "maximize_window_key";
       };
 
-      # GTK Application Theme
       xsettings = {
-        "Net/ThemeName" = "Mint-Y"; # Classic Green Accent
+        "Net/ThemeName" = "Mint-Y";
         "Net/IconThemeName" = "Mint-Y";
         "Gtk/CursorThemeName" = "volantes_light_cursors";
       };
 
-      # Window Manager Theme (Titlebars & Borders)
       xfwm4 = {
         "general/theme" = "Mint-Y";
         "general/button_layout" = "O|HMC";
+        "general/workspace_count" = 1;
+        "general/tile_on_move" = true;
+      };
+      xfce4-desktop = {
+        "desktop-icons/file-icons/show-home" = false;
+        "desktop-icons/file-icons/show-filesystem" = false;
+        "desktop-icons/file-icons/show-trash" = false;
+        "desktop-icons/file-icons/show-removable" = false;
       };
 
       xfce4-panel = {
