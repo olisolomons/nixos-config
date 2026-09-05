@@ -9,10 +9,17 @@
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, ... }@inputs:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      home-manager,
+      ...
+    }@inputs:
     let
       system = "x86_64-linux";
-    in {
+    in
+    {
       nixosConfigurations = {
         annie = nixpkgs.lib.nixosSystem {
           inherit system;
@@ -25,6 +32,7 @@
               home-manager.useUserPackages = true;
               home-manager.extraSpecialArgs = { inherit inputs; };
               home-manager.users.annie = import ./hosts/annie/home.nix;
+              home-manager.backupFileExtension = "backup";
             }
           ];
         };

@@ -95,8 +95,6 @@
 
   programs.bash.enable = true;
 
-  services.caffeine.enable = true;
-
   systemd.user.services.dropbox = {
     Unit = {
       Description = "Dropbox service";
@@ -111,5 +109,4 @@
   };
 
   programs.home-manager.enable = true;
-
 }
