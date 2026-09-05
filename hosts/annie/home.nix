@@ -24,7 +24,7 @@
       cd $HOME/src/nixos-config
       sudo nixos-rebuild --flake .#$(hostname) switch "$@"
     '')
-        libreoffice-qt
+    libreoffice-qt
     hunspell
     hunspellDicts.uk_UA
     hunspellDicts.th_TH

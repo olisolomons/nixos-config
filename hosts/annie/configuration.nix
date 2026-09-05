@@ -3,15 +3,11 @@
 {
   imports = [
     ./hardware-configuration.nix
+    ./xfce.nix
   ];
 
   networking.hostName = "annie";
 
-  services.xserver = {
-    enable = true;
-    desktopManager.xfce.enable = true;
-    displayManager.lightdm.enable = true;
-  };
   qt = {
     enable = true;
     platformTheme = "gnome";
