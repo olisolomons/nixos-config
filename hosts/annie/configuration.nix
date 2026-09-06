@@ -16,8 +16,6 @@
 
   programs.dconf.enable = true;
 
-  services.teamviewer.enable = true;
-
   system.stateVersion = "24.05";
 
   boot.loader.systemd-boot.enable = true;
@@ -56,6 +54,10 @@
     pulse.enable = true;
     wireplumber.enable = true;
   };
+
+  # printing
+  services.printing.enable = true;
+  services.printing.drivers = [ pkgs.brlaser ];
 
   users.users.annie = {
     isNormalUser = true;
