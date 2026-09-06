@@ -97,7 +97,7 @@
     xfconf.settings = {
       xfce4-keyboard-shortcuts = {
         "commands/custom/<Primary><Alt>k" =
-          "xfce4-terminal -e 'bash -c \"cd ~/Dropbox/Recipes; ./make.py; echo Press any key to exit.; read -n 1\"'";
+          "xfce4-terminal -e 'bash -c \"cd ~/Dropbox/Recipes; ignite_recipes; echo Press any key to exit.; read -n 1\"'";
 
         "commands/custom/<Primary><Alt>u" =
           "xfce4-terminal -e 'bash -c \"do-updates; echo Press any key to exit.; read -n 1\"'";

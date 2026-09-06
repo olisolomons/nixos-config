@@ -69,6 +69,10 @@
       read -n 1
       sudo nixos-rebuild --flake .#$(hostname) switch "$@"
     '')
+    (pkgs.writeScriptBin "ignite_recipes" ''
+      #!${pkgs.python3}/bin/python3
+      ${builtins.readFile ./ignite_recipes.py}
+    '')
     libreoffice-qt
     hunspell
     hunspellDicts.uk_UA
