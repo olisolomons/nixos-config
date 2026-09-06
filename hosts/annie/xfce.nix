@@ -74,7 +74,7 @@
       };
 
       Service = {
-        ExecStart = "${pkgs.xfce.xfce4-clipman-plugin}/bin/xfce4-clipman";
+        ExecStart = "${pkgs.xfce4-clipman-plugin}/bin/xfce4-clipman";
         Restart = "on-failure";
       };
 
