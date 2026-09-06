@@ -87,6 +87,10 @@
       xfce4-keyboard-shortcuts = {
         "commands/custom/<Primary><Alt>k" =
           "xfce4-terminal -e 'bash -c \"cd ~/Dropbox/Recipes; ./make.py; echo Press any key to exit.; read -n 1\"'";
+
+        "commands/custom/<Primary><Alt>u" =
+          "xfce4-terminal -e 'bash -c \"do-updates; echo Press any key to exit.; read -n 1\"'";
+
         "commands/custom/Super_L" = "xfce4-popup-whiskermenu";
         # Ctrl first, then Super
         "xfwm4/custom/<Primary><Super>Left" = "tile_left_key";
@@ -133,6 +137,7 @@
           2
           3
           4
+          5
           6
           7
           8
@@ -175,6 +180,10 @@
         # Plugin 4: Chromium Launcher
         "plugins/plugin-4" = "launcher";
         "plugins/plugin-4/items" = [ "chromium-browser.desktop" ];
+
+        # Plugin 4: Chromium Launcher
+        "plugins/plugin-5" = "launcher";
+        "plugins/plugin-5/items" = [ "spotify.desktop" ];
 
         # Plugin 6: Tasklist
         "plugins/plugin-6" = "tasklist";
@@ -229,8 +238,8 @@
   };
   programs.thunar = {
     enable = true;
-    plugins = with pkgs.xfce; [
-      thunar-archive-plugin
+    plugins = [
+      pkgs.thunar-archive-plugin
     ];
   };
 }

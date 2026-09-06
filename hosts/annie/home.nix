@@ -57,6 +57,18 @@
       cd $HOME/src/nixos-config
       sudo nixos-rebuild --flake .#$(hostname) switch "$@"
     '')
+    (writeShellScriptBin "do-updates" ''
+      #!/usr/bin/env bash
+      set -e
+      cd "$HOME/src/nixos-config"
+      echo "Updating flake inputs..."
+      nix flake update
+      echo "Rebuilding NixOS..."
+      sudo nixos-rebuild --flake .#$(hostname) build "$@"
+      echo "Press any key to activate the new version"
+      read -n 1
+      sudo nixos-rebuild --flake .#$(hostname) switch "$@"
+    '')
     libreoffice-qt
     hunspell
     hunspellDicts.uk_UA
