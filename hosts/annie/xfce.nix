@@ -27,7 +27,18 @@
     mint-themes
     ibus
     file-roller # for thunar archive plugin
+    lightlocker
   ];
+
+  systemd.user.services.light-locker = {
+    description = "LightDM Screen Locker";
+    wantedBy = [ "graphical-session.target" ];
+    partOf = [ "graphical-session.target" ];
+    serviceConfig = {
+      ExecStart = "${pkgs.lightlocker}/bin/light-locker --lock-on-suspend";
+      Restart = "on-failure";
+    };
+  };
 
   # Home Manager user configuration block
   home-manager.users.annie = { config, ... }: {
