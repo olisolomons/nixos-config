@@ -28,6 +28,8 @@
     hunspell
     hunspellDicts.uk_UA
     hunspellDicts.th_TH
+    gimp
+    p7zip
   ];
 
   programs.neovim = {

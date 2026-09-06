@@ -5,12 +5,23 @@
   services.xserver = {
     enable = true;
     desktopManager.xfce.enable = true;
+    displayManager.lightdm = {
+      enable = true;
+      greeters.slick = {
+        enable = true;
+        theme.name = "Mint-Y";
+        extraConfig = ''
+          background = ${./Quadrasineaur.jpg}
+        '';
+      };
+    };
   };
 
   environment.systemPackages = with pkgs; [
     python3
     xfce4-whiskermenu-plugin
     xfce4-pulseaudio-plugin
+    xfce4-clipman-plugin
     volantes-cursors
     mint-y-icons
     mint-themes
@@ -53,6 +64,23 @@
       # 3. Give user write permissions (clears lock emblem)
       $DRY_RUN_CMD chmod 644 "$DESKTOP_FILE"
     '';
+
+    systemd.user.services.xfce4-clipman = {
+      Unit = {
+        Description = "XFCE Clipboard Manager";
+        After = [ "graphical-session.target" ];
+        PartOf = [ "graphical-session.target" ];
+      };
+
+      Service = {
+        ExecStart = "${pkgs.xfce.xfce4-clipman-plugin}/bin/xfce4-clipman";
+        Restart = "on-failure";
+      };
+
+      Install = {
+        WantedBy = [ "graphical-session.target" ];
+      };
+    };
 
     xfconf.settings = {
       xfce4-keyboard-shortcuts = {
