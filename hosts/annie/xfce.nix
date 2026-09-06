@@ -26,6 +26,7 @@
     mint-y-icons
     mint-themes
     ibus
+    file-roller # for thunar archive plugin
   ];
 
   # Home Manager user configuration block
@@ -225,5 +226,11 @@
         "plugins/plugin-15" = "showdesktop";
       };
     };
+  };
+  programs.thunar = {
+    enable = true;
+    plugins = with pkgs.xfce; [
+      thunar-archive-plugin
+    ];
   };
 }
