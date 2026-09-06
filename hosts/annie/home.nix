@@ -159,5 +159,16 @@
     };
   };
 
+  services.redshift = {
+    enable = true;
+    temperature = {
+      day = 6500;
+      night = 2150;
+    };
+    provider = "manual";
+    latitude = 51.5;
+    longitude = 0.1;
+  };
+
   programs.home-manager.enable = true;
 }
