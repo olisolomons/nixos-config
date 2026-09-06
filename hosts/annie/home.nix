@@ -1,7 +1,40 @@
-{ pkgs, lib, ... }:
+{
+  inputs,
+  pkgs,
+  lib,
+  ...
+}:
 
 {
   home.stateVersion = "24.05";
+
+  imports = [
+    inputs.spicetify-nix.homeManagerModules.default
+  ];
+
+  programs.spicetify =
+    let
+      spicePkgs = inputs.spicetify-nix.legacyPackages.${pkgs.stdenv.hostPlatform.system};
+    in
+    {
+      enable = true;
+
+      # Theme configuration
+      theme = spicePkgs.themes.catppuccin;
+      colorScheme = "mocha";
+
+      # Optional extensions
+      enabledExtensions = with spicePkgs.extensions; [
+        adblockify
+        hidePodcasts
+        shuffle # Enables shuffle+
+      ];
+
+      # Optional custom apps
+      enabledCustomApps = with spicePkgs.apps; [
+        newReleases
+      ];
+    };
 
   programs.thunderbird = {
     enable = true;

@@ -7,6 +7,7 @@
       url = "github:nix-community/home-manager/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    spicetify-nix.url = "github:Gerg-L/spicetify-nix";
   };
 
   outputs =
@@ -14,24 +15,22 @@
       self,
       nixpkgs,
       home-manager,
+      spicetify-nix,
       ...
     }@inputs:
-    let
-      system = "x86_64-linux";
-    in
     {
       nixosConfigurations = {
         annie = nixpkgs.lib.nixosSystem {
-          inherit system;
           specialArgs = { inherit inputs; };
           modules = [
+            { nixpkgs.hostPlatform = "x86_64-linux"; }
             ./hosts/annie/configuration.nix
             home-manager.nixosModules.home-manager
             {
               home-manager.useGlobalPkgs = true;
               home-manager.useUserPackages = true;
               home-manager.extraSpecialArgs = { inherit inputs; };
-              home-manager.users.annie = import ./hosts/annie/home.nix;
+              home-manager.users.annie = ./hosts/annie/home.nix;
               home-manager.backupFileExtension = "backup";
             }
           ];
