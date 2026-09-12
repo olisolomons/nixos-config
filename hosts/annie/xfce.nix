@@ -16,6 +16,7 @@
       };
     };
   };
+  environment.xfce.excludePackages = [ pkgs.xfce4-screensaver ];
 
   environment.systemPackages = with pkgs; [
     python3
