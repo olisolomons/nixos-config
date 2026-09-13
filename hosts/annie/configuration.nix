@@ -21,6 +21,8 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.systemd-boot.configurationLimit = 5;
   boot.loader.efi.canTouchEfiVariables = true;
+  # system froze on wake up - try s2idle instead of deep
+  boot.kernelParams = [ "mem_sleep_default=s2idle" ];
 
   networking.networkmanager.enable = true;
 
