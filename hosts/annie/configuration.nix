@@ -21,8 +21,17 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.systemd-boot.configurationLimit = 5;
   boot.loader.efi.canTouchEfiVariables = true;
-  # system froze on wake up - try s2idle instead of deep
-  boot.kernelParams = [ "mem_sleep_default=s2idle" ];
+  # Coffee Lake (8th Gen) CPUs frequently lock up during sleep state transitions if allowed to enter deep states like C6 or C7. Restricting the system to shallower power states eliminates this failure mode.
+  boot.kernelParams = [
+    "intel_idle.max_cstate=1"
+    "processor.max_cstate=1"
+  ];
+  #  If the kernel wakes up but mouse or keyboard input fails to register, the PCIe USB host controller (XHCI) is likely failing to exit runtime autosuspend mode.
+  #boot.kernelParams = [
+  #  "intel_idle.max_cstate=1"
+  #  "processor.max_cstate=1"
+  #  "usbcore.autosuspend=-1"
+  #];
 
   networking.networkmanager.enable = true;
 
