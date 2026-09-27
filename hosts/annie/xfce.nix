@@ -29,6 +29,7 @@
     ibus
     file-roller # for thunar archive plugin
     lightlocker
+    system-config-printer
   ];
 
   systemd.user.services.light-locker = {
@@ -104,6 +105,23 @@
         Service = {
           ExecStart = "${pkgs.xfce4-clipman-plugin}/bin/xfce4-clipman";
           Restart = "on-failure";
+        };
+
+        Install = {
+          WantedBy = [ "graphical-session.target" ];
+        };
+      };
+      systemd.user.services.system-config-printer-applet = {
+        Unit = {
+          Description = "System Tray Print Queue Applet";
+          After = [ "graphical-session.target" ];
+          PartOf = [ "graphical-session.target" ];
+        };
+
+        Service = {
+          ExecStart = "${pkgs.system-config-printer}/bin/system-config-printer-applet";
+          Restart = "on-failure";
+          RestartSec = "5s";
         };
 
         Install = {
