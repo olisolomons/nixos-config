@@ -153,13 +153,26 @@
   systemd.user.services.dropbox = {
     Unit = {
       Description = "Dropbox service";
+      # Wait until the graphical session target is active
+      After = [ "graphical-session.target" ];
+      PartOf = [ "graphical-session.target" ];
     };
     Install = {
-      WantedBy = [ "default.target" ];
+      # Bind to the graphical session rather than default.target
+      WantedBy = [ "graphical-session.target" ];
     };
     Service = {
+      # Add a short delay to give xfce4-panel time to load its tray plugin
+      ExecStartPre = "${pkgs.coreutils}/bin/sleep 3";
       ExecStart = "${pkgs.dropbox}/bin/dropbox";
+      ExecStop = "${pkgs.dropbox}/bin/dropbox stop";
       Restart = "on-failure";
+      RestartSec = "5s";
+      Environment = [
+        "QT_QPA_PLATFORM=xcb"
+      ];
+    };
+  };
 
   # --- Daily Service & Timer (Keep 1) ---
   systemd.user.services.thunderbird-backup-daily = {
