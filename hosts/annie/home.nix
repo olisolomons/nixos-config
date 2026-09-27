@@ -73,6 +73,10 @@
       #!${pkgs.python3}/bin/python3
       ${builtins.readFile ./ignite_recipes.py}
     '')
+    (pkgs.writeScriptBin "tb-backup" ''
+      #!${pkgs.python3}/bin/python3
+      ${builtins.readFile ./tb_backup.py}
+    '')
     libreoffice-qt
     hunspell
     hunspellDicts.uk_UA
@@ -156,7 +160,41 @@
     Service = {
       ExecStart = "${pkgs.dropbox}/bin/dropbox";
       Restart = "on-failure";
+
+  # --- Daily Service & Timer (Keep 1) ---
+  systemd.user.services.thunderbird-backup-daily = {
+    Unit.Description = "Daily Thunderbird Profile Backup";
+    Service = {
+      Type = "oneshot";
+      ExecStart = "/usr/bin/env tb-backup --type daily --keep 2";
     };
+  };
+
+  systemd.user.timers.thunderbird-backup-daily = {
+    Unit.Description = "Run Daily Thunderbird Backup";
+    Timer = {
+      OnCalendar = "daily"; # Runs daily at midnight
+      Persistent = true;
+    };
+    Install.WantedBy = [ "timers.target" ];
+  };
+
+  # --- Monthly Service & Timer (Keep 2) ---
+  systemd.user.services.thunderbird-backup-monthly = {
+    Unit.Description = "Monthly Thunderbird Profile Backup";
+    Service = {
+      Type = "oneshot";
+      ExecStart = "/usr/bin/env tb-backup --type monthly --keep 2";
+    };
+  };
+
+  systemd.user.timers.thunderbird-backup-monthly = {
+    Unit.Description = "Run Monthly Thunderbird Backup";
+    Timer = {
+      OnCalendar = "monthly"; # Runs on the 1st of every month at midnight
+      Persistent = true;
+    };
+    Install.WantedBy = [ "timers.target" ];
   };
 
   services.redshift = {
