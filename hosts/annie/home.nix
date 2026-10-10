@@ -41,6 +41,8 @@
     profiles = { };
   };
   programs.chromium.enable = true;
+  programs.firefox.enable = true;
+  programs.firefox.configPath = ".mozilla/firefox";
 
   home.packages = with pkgs; [
     unzip
