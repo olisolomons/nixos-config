@@ -30,6 +30,7 @@
     file-roller # for thunar archive plugin
     lightlocker
     system-config-printer
+    catfish
   ];
 
   systemd.user.services.light-locker = {
