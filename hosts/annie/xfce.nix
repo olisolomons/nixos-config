@@ -185,6 +185,7 @@
             3
             4
             5
+            18
             6
             7
             8
@@ -228,9 +229,13 @@
           "plugins/plugin-4" = "launcher";
           "plugins/plugin-4/items" = [ "chromium-browser.desktop" ];
 
-          # Plugin 4: Chromium Launcher
+          # Plugin 4: Spotify Launcher
           "plugins/plugin-5" = "launcher";
           "plugins/plugin-5/items" = [ "spotify.desktop" ];
+
+          # Plugin 4: Writer Launcher
+          "plugins/plugin-18" = "launcher";
+          "plugins/plugin-18/items" = [ "writer.desktop" ];
 
           # Plugin 6: Tasklist
           "plugins/plugin-6" = "tasklist";
