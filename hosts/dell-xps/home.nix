@@ -1,4 +1,9 @@
-{ pkgs, lib, unstable, ... }:
+{
+  pkgs,
+  lib,
+  unstable,
+  ...
+}:
 
 let
   i3ModeExtensionUuid = "i3mode@nixos.local";
@@ -13,7 +18,8 @@ let
       glib-compile-schemas $EXT_DIR/schemas/
     '';
   };
-in {
+in
+{
   imports = [ ../../modules/home-manager/common.nix ];
 
   home.stateVersion = "24.05";
@@ -24,6 +30,11 @@ in {
     pkgs.gnomeExtensions.appindicator
     i3ModeExtension
     slack
+    (pkgs.writeScriptBin "layout_monitors" ''
+      #!${pkgs.python3}/bin/python3
+      ${builtins.readFile ./layout_monitors.py}
+    '')
+    mutter # for gdctl command, for layout_monitors
   ];
 
   home.sessionVariables = {
@@ -35,10 +46,15 @@ in {
   services.dunst.enable = true;
 
   dconf.settings = {
-    "org/gnome/desktop/input-sources" = { xkb-options = [ "ctrl:nocaps" ]; };
+    "org/gnome/desktop/input-sources" = {
+      xkb-options = [ "ctrl:nocaps" ];
+    };
     "org/gnome/shell" = {
       disable-user-extensions = false;
-      enabled-extensions = [ "appindicatorsupport@rgcjonas.gmail.com" i3ModeExtensionUuid ];
+      enabled-extensions = [
+        "appindicatorsupport@rgcjonas.gmail.com"
+        i3ModeExtensionUuid
+      ];
     };
     "org/gnome/desktop/wm/keybindings" = {
       switch-applications = [ "<Super>Tab" ];
@@ -50,18 +66,32 @@ in {
     };
     "org/gnome/settings-daemon/plugins/media-keys" = {
       logout = [ ];
+      custom-keybindings = [
+        "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/fix-monitors/"
+      ];
+    };
+    "org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/fix-monitors" = {
+      name = "Fix Monitor Layout";
+      command = "layout_monitors";
+      binding = "<Control><Super>l"; # Your shortcut key combo
     };
     "org/gnome/shell/extensions/i3mode" = {
       launch-mode = [ "<Super>r" ];
       power-mode = [ "<Super>x" ];
     };
-    "org/gnome/desktop/session" = { idle-delay = 0; };
-    "org/gnome/desktop/interface" = { show-battery-percentage = true; };
+    "org/gnome/desktop/session" = {
+      idle-delay = 0;
+    };
+    "org/gnome/desktop/interface" = {
+      show-battery-percentage = true;
+    };
     "org/gnome/settings-daemon/plugins/power" = {
       sleep-inactive-battery-timeout = 300;
       sleep-inactive-ac-timeout = 1800;
       idle-dim = false;
     };
-    "org/gnome/desktop/peripherals/touchpad" = { speed = 0.6; };
+    "org/gnome/desktop/peripherals/touchpad" = {
+      speed = 0.6;
+    };
   };
 }
