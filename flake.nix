@@ -41,6 +41,17 @@
           ];
         };
 
+        lenny = nixpkgs.lib.nixosSystem {
+          inherit system;
+          specialArgs = { inherit inputs; };
+          modules = [
+            { nixpkgs.overlays = overlays; }
+            ./hosts/lenny/configuration.nix
+            home-manager.nixosModules.home-manager
+            (hmModule "lenny")
+          ];
+        };
+
         dell-xps = nixpkgs.lib.nixosSystem {
           inherit system;
           specialArgs = { inherit inputs; };
