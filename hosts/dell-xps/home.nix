@@ -1,6 +1,5 @@
 {
   pkgs,
-  lib,
   unstable,
   ...
 }:
@@ -35,6 +34,9 @@ in
       ${builtins.readFile ./layout_monitors.py}
     '')
     mutter # for gdctl command, for layout_monitors
+    # for horizon-client/zoom-vdi
+    distrobox
+    podman
   ];
 
   home.sessionVariables = {
