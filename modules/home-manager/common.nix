@@ -25,6 +25,12 @@
       cd $HOME/src/nixos-config
       sudo nixos-rebuild --flake .#$(hostname) switch "$@"
     '')
+    (writeShellScriptBin "nrb" ''
+      #!/usr/bin/env bash
+      cd $HOME/src/nixos-config
+      nixos-rebuild --flake .#$(hostname) build "$@"
+    '')
+
   ];
 
   programs.neovim = {
