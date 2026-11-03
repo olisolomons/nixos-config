@@ -4,7 +4,9 @@ import sys
 
 def main():
     # Define your desired target resolution for the laptop screen here:
-    TARGET_LAPTOP_RESOLUTION = "1920x1200"
+    TARGET_W = 1920
+    TARGET_H = 1200
+    TARGET_LAPTOP_MODE = f"{TARGET_W}x{TARGET_H}@59.950"
 
     try:
         result = subprocess.run(["gdctl", "show"], capture_output=True, text=True, check=True)
@@ -75,26 +77,6 @@ def main():
         print("Error: Could not identify internal laptop monitor (eDP).", file=sys.stderr)
         sys.exit(1)
 
-    # Determine target mode string for the laptop
-    target_w, target_h = map(int, TARGET_LAPTOP_RESOLUTION.split('x'))
-    laptop_target_mode = None
-    
-    # Check if the target resolution exists in the available modes for the laptop
-    for w, h, mode_str in all_monitor_modes.get(laptop_mon, []):
-        if w == target_w and h == target_h:
-            laptop_target_mode = mode_str
-            break
-            
-    # Fallback if exact mode match isn't in the list, use current or construct with a default refresh rate
-    if not laptop_target_mode:
-        current_laptop_mode = monitors_data[laptop_mon]["mode"]
-        # Try to swap out resolution dimensions while keeping the refresh rate suffix if possible
-        if "@" in current_laptop_mode:
-            refresh_suffix = current_laptop_mode.split("@")[1]
-            laptop_target_mode = f"{TARGET_LAPTOP_RESOLUTION}@{refresh_suffix}"
-        else:
-            laptop_target_mode = f"{TARGET_LAPTOP_RESOLUTION}@60.0"
-
     # Base command: 'gdctl set' with '--persistent'
     cmd = ["gdctl", "set", "--persistent"]
 
@@ -104,7 +86,7 @@ def main():
             "--logical-monitor", "--primary",
             "--monitor", laptop_mon,
             "--scale", "1",
-            "--mode", laptop_target_mode,
+            "--mode", TARGET_LAPTOP_MODE,
             "--x", "0", "--y", "0"
         ])
         subprocess.run(cmd, check=True)
@@ -138,19 +120,19 @@ def main():
         prev_ext = ext
 
     # Calculate laptop positioning using the target width
-    laptop_x = max(0, (total_ext_width - target_w) // 2)
+    laptop_x = max(0, (total_ext_width - TARGET_W) // 2)
     laptop_y = max_ext_height
 
     cmd.extend([
         "--logical-monitor",
         "--monitor", laptop_mon,
         "--scale", "1",
-        "--mode", laptop_target_mode,
+        "--mode", TARGET_LAPTOP_MODE,
         "--x", str(laptop_x),
         "--y", str(laptop_y)
     ])
 
-    print(f"Applying layout via gdctl (External width: {total_ext_width}px, Laptop centered at x={laptop_x}, y={laptop_y} with mode {laptop_target_mode})...")
+    print(f"Applying layout via gdctl (External width: {total_ext_width}px, Laptop centered at x={laptop_x}, y={laptop_y} with mode {TARGET_LAPTOP_MODE})...")
     try:
         subprocess.run(cmd, check=True)
         print("Layout applied and saved persistently successfully!")
