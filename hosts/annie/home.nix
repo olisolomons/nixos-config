@@ -199,7 +199,7 @@
     Unit.Description = "Monthly Thunderbird Profile Backup";
     Service = {
       Type = "oneshot";
-      ExecStart = "/usr/bin/env tb-backup --type monthly --keep 2";
+      ExecStart = "/usr/bin/env tb-backup --type monthly --keep 1";
     };
   };
 

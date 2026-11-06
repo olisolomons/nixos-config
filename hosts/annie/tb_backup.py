@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 import argparse
+import shutil
 import sys
 import tarfile
+import tempfile
 from datetime import datetime
 from pathlib import Path
 
@@ -10,9 +12,17 @@ SOURCE_DIR = HOME / ".thunderbird"
 BACKUP_DIR = HOME / "Dropbox" / "ThunderbirdBackups"
 
 
+def exclude_caches(tarinfo):
+    """Exclude non-essential Thunderbird cache and temporary directories."""
+    cache_dirs = {"Cache", "cache2", "startupCache", "OfflineCache", "crashes", "datareporting"}
+    if any(part in cache_dirs for part in Path(tarinfo.name).parts):
+        return None
+    return tarinfo
+
+
 def rotate_backups(backup_dir: Path, backup_type: str, max_keep: int) -> None:
     """Keep only the latest N backup archives for the specified backup type."""
-    pattern = f"thunderbird_{backup_type}_*.tar.gz"
+    pattern = f"thunderbird_{backup_type}_*.tar.xz"
     backups = sorted(
         backup_dir.glob(pattern),
         key=lambda p: p.stat().st_mtime,
@@ -33,11 +43,20 @@ def create_backup(backup_type: str, max_keep: int) -> None:
     BACKUP_DIR.mkdir(parents=True, exist_ok=True)
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    archive_path = BACKUP_DIR / f"thunderbird_{backup_type}_{timestamp}.tar.gz"
+    filename = f"thunderbird_{backup_type}_{timestamp}.tar.xz"
+    final_path = BACKUP_DIR / filename
 
-    print(f"Creating {backup_type} archive at {archive_path}...")
-    with tarfile.open(archive_path, "w:gz") as tar:
-        tar.add(SOURCE_DIR, arcname=".thunderbird")
+    # Create the archive inside a secure temporary directory
+    print(f"Creating {backup_type} archive in local temp directory...")
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        temp_archive_path = Path(tmp_dir) / filename
+
+        with tarfile.open(temp_archive_path, "w:xz") as tar:
+            tar.add(SOURCE_DIR, arcname=".thunderbird", filter=exclude_caches)
+
+        print(f"Moving archive safely to Dropbox: {final_path}...")
+        # shutil.move handles moving across filesystems/directories atomically
+        shutil.move(str(temp_archive_path), str(final_path))
 
     print(f"{backup_type.capitalize()} backup completed successfully.")
     rotate_backups(BACKUP_DIR, backup_type, max_keep)
