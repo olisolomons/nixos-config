@@ -41,7 +41,6 @@
       (with unstable.vimPlugins; [
         telescope-nvim
         telescope-ui-select-nvim
-        nvim-lspconfig
         nvim-treesitter
         rose-pine
         vim-fugitive

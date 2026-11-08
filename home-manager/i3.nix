@@ -8,8 +8,7 @@
       terminal = "alacritty";
       startup = [
         {
-          command =
-            "--no-startup-id ${pkgs.networkmanagerapplet}/bin/nm-applet";
+          command = "--no-startup-id ${pkgs.networkmanagerapplet}/bin/nm-applet";
         }
         { command = "--no-startup-id ${pkgs.pasystray}/bin/pasystray"; }
         { command = "--no-startup-id blueman-applet"; }
@@ -22,6 +21,7 @@
         "${modifier}+z" = "mode brightness";
         "${modifier}+ctrl+z" = "mode audio";
         "${modifier}+r" = "mode launch";
+        "${modifier}+p" = "mode passthrough";
 
         # Focus
         "${modifier}+j" = "focus left";
@@ -53,35 +53,42 @@
 
           Escape = "mode default";
         };
-        brightness = let b = "${pkgs.brightnessctl}/bin/brightnessctl";
-        in {
-          "${modifier}+z" = "exec ${b} set 1, mode default";
-          z = "exec ${b} set 1, mode default";
-          q = "exec ${b} set 2%+";
-          a = "exec ${b} set 2%- --min-value 1";
+        brightness =
+          let
+            b = "${pkgs.brightnessctl}/bin/brightnessctl";
+          in
+          {
+            "${modifier}+z" = "exec ${b} set 1, mode default";
+            z = "exec ${b} set 1, mode default";
+            q = "exec ${b} set 2%+";
+            a = "exec ${b} set 2%- --min-value 1";
 
-          Escape = "mode default";
-        };
-        audio = let
-          pactl = opt: val:
-            "exec ${pkgs.pulseaudio}/bin/pactl set-sink-${opt} @DEFAULT_SINK@ ${val}";
-        in {
-          q = pactl "volume" "+10%";
-          a = pactl "volume" "-10%";
-          z = pactl "mute" "0" + ", mode default";
-          "shift+z" = pactl "mute" "1" + ", mode default";
+            Escape = "mode default";
+          };
+        audio =
+          let
+            pactl = opt: val: "exec ${pkgs.pulseaudio}/bin/pactl set-sink-${opt} @DEFAULT_SINK@ ${val}";
+          in
+          {
+            q = pactl "volume" "+10%";
+            a = pactl "volume" "-10%";
+            z = pactl "mute" "0" + ", mode default";
+            "shift+z" = pactl "mute" "1" + ", mode default";
 
-          Escape = "mode default";
-        };
+            Escape = "mode default";
+          };
         launch = {
           f = "exec firefox, mode default";
           t = "exec alacritty, mode default";
-          v =
-            "exec --no-startup-id obs --startvirtualcam --minimize-to-tray --safe-mode, mode default";
+          v = "exec --no-startup-id obs --startvirtualcam --minimize-to-tray --safe-mode, mode default";
           "Shift+v" = "exec --no-startup-id pkill obs, mode default";
           c = "exec chromium, mode default";
 
           Escape = "mode default";
+        };
+        passthrough = {
+
+          "${modifier}+Escape" = "mode default";
         };
       };
     };

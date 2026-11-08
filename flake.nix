@@ -14,7 +14,15 @@
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, nixpkgs-unstable, nur, ... }@inputs:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      home-manager,
+      nixpkgs-unstable,
+      nur,
+      ...
+    }@inputs:
     let
       system = "x86_64-linux";
       unstable = import nixpkgs-unstable {
@@ -28,7 +36,8 @@
         home-manager.extraSpecialArgs = { inherit inputs unstable; };
         home-manager.users.oli = import ./hosts/${host}/home.nix;
       };
-    in {
+    in
+    {
       nixosConfigurations = {
         adele = nixpkgs.lib.nixosSystem {
           inherit system;

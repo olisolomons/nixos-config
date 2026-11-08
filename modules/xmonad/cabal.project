@@ -1,0 +1,4 @@
+packages: .
+
+-- Force Cabal to unpack and link dependency sources locally
+write-ghc-environment-files: always

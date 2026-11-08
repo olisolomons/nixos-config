@@ -67,6 +67,10 @@ vim.cmd("colorscheme rose-pine")
 
 vim.lsp.enable('nil_ls')
 vim.lsp.config('nil_ls', {
+  cmd = { 'nil' },
+  filetypes = { 'nix' },
+  single_file_support = true,
+  root_markers = { 'flake.nix', '.git' },
   settings = {
     ['nil'] = {
       formatting = {
@@ -76,13 +80,40 @@ vim.lsp.config('nil_ls', {
   },
 })
 
+vim.lsp.config('hls', {
+  cmd = { 'haskell-language-server-wrapper', '--lsp' },
+  filetypes = { 'haskell', 'lhaskell', 'cabal' },
+  root_markers = { 'flake.nix', 'cabal.project', 'stack.yaml', '.git' },
+  settings = {
+    haskell = {
+      plugin = {
+        hlint = {
+          globalOn = true,
+        },
+      },
+    },
+  },
+})
+vim.lsp.enable('hls')
+
 vim.lsp.config('pyright', {})
 
 vim.lsp.config('clojure_lsp', {})
 
-vim.lsp.config('ocamllsp', {})
-
 vim.lsp.config('lua_ls', {
+  cmd = { 'lua-language-server' },
+  filetypes = { 'lua' },
+  root_markers = { '.luarc.json',
+    '.luarc.json',
+    '.luacheckrc',
+    '.stylua.toml',
+    'stylua.toml',
+    'selene.toml',
+    'selene.yml',
+    '.git',
+  },
+  single_file_support = true,
+  log_level = vim.lsp.protocol.MessageType.Debug,
   settings = {
     Lua = {
       runtime = {
@@ -108,8 +139,7 @@ vim.lsp.config('lua_ls', {
     },
   },
 })
-
-vim.lsp.config('gopls', {})
+vim.lsp.enable('lua_ls')
 
 vim.api.nvim_create_autocmd('LspAttach', {
   group = vim.api.nvim_create_augroup('UserLspConfig', {}),
