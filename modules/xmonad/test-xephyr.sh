@@ -25,10 +25,6 @@ DISPLAY=:1 \
   "$CACHE_DIR/xmonad-x86_64-linux" &
 XMONAD_PID=$!
 
-# Launch xclock to verify window tiling and rendering
-DISPLAY=:1 xclock &
-XCLOCK_PID=$!
-
-trap "kill $XMONAD_PID $XCLOCK_PID $XEPHYR_PID 2>/dev/null" EXIT
+trap "kill $XMONAD_PID $XEPHYR_PID 2>/dev/null" EXIT
 
 wait $XEPHYR_PID

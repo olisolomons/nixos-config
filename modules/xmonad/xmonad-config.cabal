@@ -8,4 +8,6 @@ executable xmonad
                   , xmonad
                   , xmonad-contrib
                   , xmobar
+                  , containers
+                  , process
   default-language: Haskell2010

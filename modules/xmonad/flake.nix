@@ -18,6 +18,8 @@
           xmonad
           xmonad-contrib
           xmobar
+          containers
+          process
         ]
       );
 
@@ -43,15 +45,7 @@
           hpkgs.haskell-language-server
           pkgs.cabal-install
           pkgs.xorg-server # Xephyr, for quick iteration
-          pkgs.fontconfig
-          pkgs.jetbrains-mono
-          pkgs.xorg.xeyes
-          pkgs.xorg.xclock
         ];
-        # Ensure fontconfig knows where to look for fonts inside the shell
-        FONTCONFIG_FILE = pkgs.makeFontsConf {
-          fontDirectories = [ pkgs.jetbrains-mono ];
-        };
       };
     };
 }
