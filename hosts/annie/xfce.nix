@@ -14,6 +14,10 @@
           background = ${./Quadrasineaur.jpg}
         '';
       };
+      extraConfig = ''
+        [LightDM]
+        log-level = debug
+      '';
     };
   };
   environment.xfce.excludePackages = [ pkgs.xfce4-screensaver ];
@@ -32,16 +36,6 @@
     system-config-printer
     catfish
   ];
-
-  systemd.user.services.light-locker = {
-    description = "LightDM Screen Locker";
-    wantedBy = [ "graphical-session.target" ];
-    partOf = [ "graphical-session.target" ];
-    serviceConfig = {
-      ExecStart = "${pkgs.lightlocker}/bin/light-locker --lock-on-suspend";
-      Restart = "on-failure";
-    };
-  };
 
   # Home Manager user configuration block
   home-manager.users.annie =
@@ -131,6 +125,10 @@
       };
 
       xfconf.settings = {
+        # lock screen suspend hibernate is managed by light-locker/lightdm
+        xfce4-power-manager = {
+          "xfce4-power-manager/lock-screen-suspend-hibernate" = false;
+        };
         xfce4-keyboard-shortcuts = {
           "commands/custom/<Primary><Alt>k" =
             "xfce4-terminal -e 'bash -c \"cd ~/Dropbox/Recipes; ignite_recipes; echo Press any key to exit.; read -n 1\"'";

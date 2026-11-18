@@ -1,0 +1,49 @@
+Here is a complete technical summary of the task, knowns, and unknowns for a future agent to seamlessly continue this investigation and remediation.
+
+Task Summary
+Objective: Permanently eliminate an intermittent bug on NixOS / Xfce4 where lightdm with slick-greeter displays two stacked password boxes upon wake from sleep / screen unlocking. Both boxes must currently be filled for authentication to succeed.
+
+Knowns (Established Facts & Findings)
+Architecture & Software Stack:
+
+OS/Desktop: NixOS (unstable/26.05), Xfce4 desktop environment (services.xserver.desktopManager.xfce.enable = true).
+
+Display Manager / Greeter: LightDM with slick-greeter (lightdm-slick-greeter version 2.2.6).
+
+Screen Locker: light-locker (installed via environment.systemPackages and launched via XDG autostart /run/current-system/sw/etc/xdg/autostart/light-locker.desktop).
+
+The PAM Stack:
+
+/etc/pam.d/lightdm delegates to /etc/pam.d/login.
+
+/etc/pam.d/login uses pam_unix (unix-early and try_first_pass) alongside pam_gnome_keyring.so.
+
+Conclusion: PAM itself only ever sends one PAM_PROMPT_ECHO_OFF per authentication session. PAM is not sending two sequential prompts.
+
+The slick-greeter Source Code Flaw (2.2.6):
+
+Prompt Stacking: In greeter-list.vala (add_prompt), new password DashEntry widgets are appended to PromptBox without clearing existing entries unless will_clear is set to true.
+
+The Reset Guard (will_clear): will_clear is only set to true when a prompt box is actively submitted (prompt_box_respond_cb).
+
+The Race Condition: If a second start_authentication() or VT switch / screen-lock event triggers before a prompt is submitted (when will_clear == false), start_authentication() does not call selected_entry.clear(). Instead, LightDM triggers another show_prompt event, causing slick-greeter to append a second password box directly underneath the first.
+
+Dual Submission: When the user hits Enter, prompt_box_respond_cb iterates through foreach (var response in responses) and sends all stacked responses to LightDM via SlickGreeter.singleton.respond(response), which is why both boxes must be filled.
+
+Launcher Race:
+
+Both a competing systemd.user.services.light-locker unit and the XDG autostart file competed for the D-Bus org.freedesktop.ScreenSaver name, causing redundant activation attempts.
+
+Unknowns (Open Items for the Future Agent)
+Exact Intermittent Trigger Event:
+
+While the code path in slick-greeter is fully mapped out, the exact external event triggering the redundant start_authentication() call during wake-from-sleep (e.g., a race between light-locker calling SwitchToGreeter and xfce4-power-manager invoking xflock4 simultaneously) needs final confirmation via the newly enabled --debug logs.
+
+Verification of --debug Logs:
+
+The user enabled lightdm --debug in configuration.nix, but because display-manager.service restarts are deferred by NixOS, the next system reboot or explicit sudo systemctl restart display-manager.service will be required to capture the exact timestamped sequence when/if the bug recurs.
+
+Recommended Next Actions for the Future Agent
+Inspect /var/log/lightdm/lightdm.log and /var/log/lightdm/seat0-greeter.log after a reboot to verify debug output.
+
+If desired, write a NixOS overrideAttrs patch for lightdm-slick-greeter to force selected_entry.clear() inside start_authentication() unconditionally, permanently immunizing the greeter against prompt stacking.
