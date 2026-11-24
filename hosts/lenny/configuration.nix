@@ -44,9 +44,14 @@
   programs.dconf.enable = true;
 
   services.teamviewer.enable = true;
-  systemd.services.teamviewerd.wantedBy = lib.mkForce [];
+  systemd.services.teamviewerd.wantedBy = lib.mkForce [ ];
 
   system.stateVersion = "24.05";
 
   services.udisks2.enable = true;
+
+  # attempt fix for click when audio starts after audio has gone into power saving
+  boot.extraModprobeConfig = ''
+    options snd_hda_intel power_save=0
+  '';
 }
