@@ -4,13 +4,13 @@
   imports = [
     ./hardware-configuration.nix
     ../../modules/nixos/common.nix
+    ../../modules/xmonad/module.nix
   ];
 
   networking.hostName = "adele";
 
   services.xserver = {
     enable = true;
-    windowManager.i3.enable = true;
     displayManager.lightdm = {
       enable = true;
       background = ../../bg.jpg;
@@ -32,7 +32,6 @@
       ${pkgs.lightlocker}/bin/light-locker --no-lock-on-lid --lock-after-screensaver=0 &
     '';
   };
-  services.displayManager.defaultSession = "none+i3";
   services.logind.settings.Login.HandleLidSwitchExternalPower = "ignore";
 
   qt = {

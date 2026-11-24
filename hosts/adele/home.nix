@@ -1,9 +1,8 @@
-{ pkgs, lib, ... }:
+{ pkgs, ... }:
 
 {
   imports = [
     ../../modules/home-manager/common.nix
-    ../../home-manager/i3.nix
   ];
 
   home.stateVersion = "24.05";
@@ -13,10 +12,7 @@
     zip
     claude-code
   ];
-  programs.thunderbird = {
-    enable = true;
-    profiles = { };
-  };
+
   services.udiskie = {
     enable = true;
     tray = "auto"; # Adds a tray icon in polybar/i3bar to unmount drives safely

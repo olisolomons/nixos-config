@@ -12,6 +12,10 @@
       url = "github:nix-community/home-manager/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    xmonad-config = {
+      url = "path:./modules/xmonad";
+      inputs.nixpkgs.follows = "nixpkgs-unstable"; # matches ghc912 / modern xmonad & xmobar
+    };
   };
 
   outputs =

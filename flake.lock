@@ -100,8 +100,25 @@
         "home-manager": "home-manager",
         "nixpkgs": "nixpkgs",
         "nixpkgs-unstable": "nixpkgs-unstable",
-        "nur": "nur"
+        "nur": "nur",
+        "xmonad-config": "xmonad-config"
       }
+    },
+    "xmonad-config": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs-unstable"
+        ]
+      },
+      "locked": {
+        "path": "./modules/xmonad",
+        "type": "path"
+      },
+      "original": {
+        "path": "./modules/xmonad",
+        "type": "path"
+      },
+      "parent": []
     }
   },
   "root": "root",
