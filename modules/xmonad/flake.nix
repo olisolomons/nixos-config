@@ -17,7 +17,6 @@
         hp: with hp; [
           xmonad
           xmonad-contrib
-          xmobar
           containers
           process
         ]
@@ -43,6 +42,7 @@
         packages = [
           haskellEnv
           hpkgs.haskell-language-server
+          hpkgs.xmobar
           pkgs.cabal-install
           pkgs.xorg-server # Xephyr, for quick iteration
         ];

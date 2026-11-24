@@ -18,10 +18,11 @@ Xephyr :1 -screen 1280x720 -ac -br +extension RANDR &
 XEPHYR_PID=$!
 sleep 1
 
-# Launch XMonad
+# Launch XMonad with XMOBAR_CONFIG_DIR pointed directly at your config dir
 DISPLAY=:1 \
   XDG_CONFIG_HOME="$DEV_XDG/config" \
   XDG_CACHE_HOME="$DEV_XDG/cache" \
+  XMOBAR_CONFIG_DIR="$(pwd)" \
   "$CACHE_DIR/xmonad-x86_64-linux" &
 XMONAD_PID=$!
 
