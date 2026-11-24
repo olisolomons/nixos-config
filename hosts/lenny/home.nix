@@ -1,4 +1,4 @@
-{ pkgs, lib, ... }:
+{ pkgs, ... }:
 
 {
   imports = [
@@ -12,11 +12,9 @@
     unzip
     zip
     claude-code
+    proton-vpn
   ];
-  programs.thunderbird = {
-    enable = true;
-    profiles = { };
-  };
+
   services.udiskie = {
     enable = true;
     tray = "auto"; # Adds a tray icon in polybar/i3bar to unmount drives safely
