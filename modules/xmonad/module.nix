@@ -5,20 +5,26 @@
 }:
 let
   system = pkgs.stdenv.hostPlatform.system;
+  xmonadPkg = inputs.xmonad-config.packages.${system}.default;
 in
 {
-  # --- NixOS system layer ---
-  programs.brightnessctl.enable = true;
-
   services.xserver = {
     enable = true;
-    windowManager.xmonad = {
-      enable = true;
-      package = inputs.xmonad-config.packages.${system}.default;
-    };
+    windowManager.session = [
+      {
+        name = "xmonad";
+        manage = "window";
+        start = ''
+          ${xmonadPkg}/bin/xmonad-x86_64-linux &
+          waitPID=$!
+        '';
+      }
+    ];
   };
+  services.displayManager.defaultSession = "none+xmonad";
 
   environment.systemPackages = with pkgs; [
+    xmonadPkg
     brightnessctl
     pulseaudio # provides pactl
     xmobar
@@ -44,6 +50,9 @@ in
         --transparent true \
         --alpha 0 \
         --height 20 &
+
+      ${pkgs.networkmanagerapplet}/bin/nm-applet &
+      ${pkgs.pasystray}/bin/pasystray &
     '';
     xsession.enable = true;
   };
