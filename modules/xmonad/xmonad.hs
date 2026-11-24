@@ -1,21 +1,24 @@
 import qualified Data.Map.Strict as M
 import Data.Monoid ((<>))
-import System.Exit
-import System.Process
+import System.Exit ()
+import System.Process ()
 import XMonad
 import qualified XMonad.Actions.CopyWindow as Copy
 import XMonad.Actions.Submap (submap)
-import XMonad.Hooks.DynamicLog
-import XMonad.Hooks.EwmhDesktops
+import XMonad.Hooks.DynamicLog ()
+import XMonad.Hooks.EwmhDesktops ( ewmh )
 import XMonad.Hooks.StatusBar
-import XMonad.Hooks.StatusBar.PP
-import XMonad.Layout.NoBorders
-import XMonad.Layout.Spiral
-import XMonad.Prompt
+    ( withEasySB, statusBarProp, defToggleStrutsKey )
+import XMonad.Hooks.StatusBar.PP ()
+import XMonad.Layout.NoBorders ( smartBorders, noBorders )
+import XMonad.Layout.Spiral ( spiral )
+import XMonad.Prompt ()
 import qualified XMonad.StackSet as W
-import XMonad.Util.EZConfig
+import XMonad.Util.EZConfig ( mkKeymap )
 import qualified XMonad.Util.Hacks as Hacks
-import XMonad.Util.Run
+import XMonad.Util.Run ( runInTerm )
+import System.Environment (getExecutablePath)
+import XMonad.Operations (restart)
 
 main :: IO ()
 main =
@@ -45,7 +48,7 @@ myKeys conf =
       ("M-S-q", Copy.kill1), -- %! Close the focused window
       ("M-<Space>", sendMessage NextLayout), -- %! Rotate through the available layout algorithms
       ("M-S-<Space>", setLayout $ XMonad.layoutHook conf), -- %!  Reset the layouts on the current workspace to default
-      ("M-<F5>", refresh), -- %! Resize viewed windows to the correct size
+      ("M-<F5>", io getExecutablePath >>= \exe -> restart exe True),
 
       -- move focus up or down the window stack
       ("M-<Tab>", windows W.focusDown), -- %! Move focus to the next window

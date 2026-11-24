@@ -38,22 +38,38 @@ in
   home-manager.users.oli = {
     xdg.configFile."xmobar/xmobarrc".source = ./xmobarrc;
 
-    xsession.initExtra = ''
-      ${pkgs.trayer}/bin/trayer \
-        --edge top \
-        --align right \
-        --widthtype request \
-        --padding 6 \
-        --SetDockType true \
-        --SetPartialStrut true \
-        --expand true \
-        --transparent true \
-        --alpha 0 \
-        --height 20 &
+    services.network-manager-applet.enable = true;
+    services.pasystray.enable = true;
 
-      ${pkgs.networkmanagerapplet}/bin/nm-applet &
-      ${pkgs.pasystray}/bin/pasystray &
-    '';
-    xsession.enable = true;
+    systemd.user.services.trayer = {
+      Unit = {
+        Description = "Trayer system tray";
+        PartOf = [ "graphical-session.target" ];
+        After = [ "graphical-session.target" ];
+      };
+      Service = {
+        ExecStart = ''
+          ${pkgs.trayer}/bin/trayer \
+            --edge top \
+            --align right \
+            --widthtype request \
+            --heighttype pixel \
+            --height 17 \
+            --padding 4 \
+            --SetDockType true \
+            --SetPartialStrut true \
+            --expand true \
+            --transparent true \
+            --alpha 0 \
+            --tint 0x5f5f5f
+        '';
+        Restart = "on-failure";
+        RestartSec = 2;
+      };
+      Install.WantedBy = [ "graphical-session.target" ];
+    };
+
+    systemd.user.services.network-manager-applet.Unit.After = [ "trayer.service" ];
+    systemd.user.services.pasystray.Unit.After = [ "trayer.service" ];
   };
 }
