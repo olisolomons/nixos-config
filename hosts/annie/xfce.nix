@@ -5,6 +5,7 @@
   services.xserver = {
     enable = true;
     desktopManager.xfce.enable = true;
+    desktopManager.xfce.enableScreensaver = false;
     displayManager.lightdm = {
       enable = true;
       greeters.slick = {
@@ -14,13 +15,8 @@
           background = ${./Quadrasineaur.jpg}
         '';
       };
-      extraConfig = ''
-        [LightDM]
-        log-level = debug
-      '';
     };
   };
-  environment.xfce.excludePackages = [ pkgs.xfce4-screensaver ];
 
   environment.systemPackages = with pkgs; [
     python3
@@ -32,7 +28,6 @@
     mint-themes
     ibus
     file-roller # for thunar archive plugin
-    lightlocker
     system-config-printer
     catfish
   ];
@@ -125,9 +120,8 @@
       };
 
       xfconf.settings = {
-        # lock screen suspend hibernate is managed by light-locker/lightdm
-        xfce4-power-manager = {
-          "xfce4-power-manager/lock-screen-suspend-hibernate" = false;
+        xfce4-session = {
+          "general/LockCommand" = "dm-tool lock";
         };
         xfce4-keyboard-shortcuts = {
           "commands/custom/<Primary><Alt>k" =
@@ -284,6 +278,12 @@
           # Plugin 15: Show Desktop
           "plugins/plugin-15" = "showdesktop";
         };
+      };
+
+      services.screen-locker = {
+        enable = true;
+        lockCmd = "dm-tool lock";
+        xautolock.enable = false;
       };
     };
   programs.thunar = {
